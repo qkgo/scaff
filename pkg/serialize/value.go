@@ -5,7 +5,7 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/go-xorm/xorm"
 	"github.com/jinzhu/gorm"
-	"github.com/mongodb/mongo-go-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo"
 	"strconv"
 )
 
