@@ -1,7 +1,7 @@
 package util
 
 import (
-	"github.com/chain-zhang/pinyin"
+	"github.com/Chain-Zhang/pinyin"
 	"regexp"
 	"strconv"
 	"time"
