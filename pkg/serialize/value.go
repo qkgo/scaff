@@ -5,7 +5,7 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/go-xorm/xorm"
 	"github.com/jinzhu/gorm"
-	"github.com/mongodb/mongo-go-driver/mongo"
+//	"github.com/mongodb/mongo-go-driver/mongo"
 	"strconv"
 )
 
@@ -13,7 +13,7 @@ var DB *gorm.DB
 
 var SecondDB *gorm.DB
 
-var MonGoDB *mongo.Client
+// var MonGoDB *mongo.Client
 
 var XDB *xorm.Engine
 
