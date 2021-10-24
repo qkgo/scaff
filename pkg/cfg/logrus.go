@@ -3,12 +3,15 @@ package cfg
 import (
 	"fmt"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"io"
 	"os"
 	"path"
+	"strconv"
 	"time"
+
+	"github.com/pkg/errors"
+	//"github.com/rifflock/lfshook"
+	"github.com/sirupsen/logrus"
 )
 
 var ProjectName string
@@ -19,7 +22,6 @@ func SettingProjectName(projectName string) {
 func GetProjectName() string {
 	return ProjectName
 }
-
 
 func InitLogByProjectNameV3(
 	logger **logrus.Logger,
@@ -42,10 +44,31 @@ func InitLogByProjectNameV3(
 		}
 		baseLogPath = path.Join(currentPath, "logs")
 	}
-	env := os.Getenv("env")
+	env := os.Getenv("ENV")
 	if env == "" && ConfigParam != nil {
 		env = ConfigParam.GetString("env")
 	}
+	logToFile := os.Getenv("LOG_TO_FILE")
+	if logToFile == "" && ConfigParam != nil {
+		logToFile = ConfigParam.GetString("logtoFile")
+	}
+
+	logMaxAgeParam := os.Getenv("LOG_KEEP_HOUR")
+	if logMaxAgeParam == "" && ConfigParam != nil {
+		logMaxAgeParam = ConfigParam.GetString("maxLogKeepHour")
+	}
+	var logMaxAge time.Duration
+	if logMaxAgeParam == "" {
+		logMaxAge = 30 * 24 * time.Hour
+	} else {
+		paramHour, err := strconv.Atoi(logMaxAgeParam)
+		if err != nil {
+			logMaxAge = 30 * 24 * time.Hour
+		} else {
+			logMaxAge = time.Duration(paramHour) * time.Hour
+		}
+	}
+
 	*logger = logrus.New()
 	(*logger).SetReportCaller(true)
 	os.MkdirAll(baseLogPath, os.ModePerm)
@@ -57,16 +80,16 @@ func InitLogByProjectNameV3(
 		filename = filename + "-" + level
 	}
 	filename = filename + ".%Y-%m-%d-%H.log"
+	logFilePath := path.Join(baseLogPath, filename)
 	writer, err := rotatelogs.New(
-		path.Join(baseLogPath, filename),
-		rotatelogs.WithLinkName(path.Join(baseLogPath, projectName+".log")),
+		logFilePath,
 		rotatelogs.WithHandler(rotatelogs.HandlerFunc(func(e rotatelogs.Event) {
 			if e.Type() != rotatelogs.FileRotatedEventType {
 				return
 			}
 			println("rotate:", e.(*rotatelogs.FileRotatedEvent).PreviousFile(), e.(*rotatelogs.FileRotatedEvent).CurrentFile())
 		})),
-		rotatelogs.WithMaxAge(30*24*time.Hour),
+		rotatelogs.WithMaxAge(logMaxAge),
 		rotatelogs.WithRotationTime(time.Hour),
 	)
 	if err != nil {
@@ -75,17 +98,23 @@ func InitLogByProjectNameV3(
 		os.Exit(-1)
 		return
 	}
-	if printConsole {
+	(*logger).SetFormatter(new(MyFormatter))
+	if logToFile == "" {
+		fmt.Printf("%6.9s;%6.9s; %9.9s;  [logtoFile]:false , write stdout\n", projectName, env, level)
+		(*logger).SetOutput(os.Stdout)
+	} else if printConsole {
+		fmt.Printf("%6.9s;%6.9s; %9.9s;  [logtoFile]:true [printConsole]:true, write stdout and file: %s \n", projectName, env, level, logFilePath)
 		writers := []io.Writer{
 			writer,
 			os.Stdout}
 		fileAndStdoutWriter := io.MultiWriter(writers...)
 		(*logger).SetOutput(fileAndStdoutWriter)
 	} else {
+		fmt.Printf("%6.9s;%6.9s; %9.9s;  [logtoFile]:ture [printConsole]:false, write file: %s \n", projectName, env, level, logFilePath)
 		(*logger).SetOutput(writer)
 	}
-	(*logger).SetFormatter(new(MyFormatter))
-	(*logger).Info("init log config success")
+
+	go (*logger).Infof("%9.9s;%9.9s; %9.9s; - init log succeed", projectName, env, level)
 }
 
 

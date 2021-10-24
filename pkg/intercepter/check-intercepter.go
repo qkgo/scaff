@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/qkgo/scaff/pkg/cfg"
 	"github.com/qkgo/scaff/pkg/util"
+	"gopkg.in/resty.v1"
 	"net/http"
 )
 

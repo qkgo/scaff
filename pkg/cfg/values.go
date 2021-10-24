@@ -1,9 +1,9 @@
 package cfg
 
 import (
+	ozzo "github.com/go-ozzo/ozzo-config"
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
-	ozzo "github.com/go-ozzo/ozzo-config"
 	"strconv"
 	"sync"
 )
@@ -12,11 +12,13 @@ var Configuration map[string]interface{}
 
 var Log *logrus.Logger
 
+var LogDebug *logrus.Logger
+
 var LogInfo *logrus.Logger
 
 var LogHttp *logrus.Logger
 
-var LogKey *logrus.Logger
+var LogRpc *logrus.Logger
 
 var SqlLog *logrus.Logger
 

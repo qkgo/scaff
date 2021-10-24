@@ -11,9 +11,9 @@ var LruCache *lru.Cache
 
 func init() {
 	lruCacheSize := 8
-	CacheSize := os.Getenv("CACHESIZE")
+	CacheSize := os.Getenv("CACHE_SIZE")
 	if CacheSize != "" {
-		fmt.Println("CACHESIZE:", CacheSize)
+		fmt.Println("CACHE-SIZE:", CacheSize)
 		lruCacheNum, err := strconv.Atoi(CacheSize)
 		if err == nil {
 			lruCacheSize = lruCacheNum

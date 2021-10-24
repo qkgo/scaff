@@ -3,6 +3,7 @@ package boot
 import (
 	"github.com/qkgo/scaff/pkg/cfg"
 	"github.com/qkgo/scaff/pkg/intercepter"
+	"gopkg.in/resty.v1"
 	"strings"
 	"sync"
 	"sync/atomic"

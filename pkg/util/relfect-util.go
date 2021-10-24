@@ -3,6 +3,7 @@ package util
 import (
 	"encoding/json"
 	"reflect"
+	null "gopkg.in/guregu/null.v3"
 )
 
 func GetString(str interface{}) string {
