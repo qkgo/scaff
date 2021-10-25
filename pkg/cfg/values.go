@@ -20,6 +20,8 @@ var LogHttp *logrus.Logger
 
 var LogRpc *logrus.Logger
 
+var LogKey *logrus.Logger
+
 var SqlLog *logrus.Logger
 
 var ManualLog *logrus.Logger
