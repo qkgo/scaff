@@ -1,7 +1,7 @@
 package cfg
 
 import (
-	yaml "gopkg.in/yaml.v3"
+	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"log"
 	"os"
@@ -9,7 +9,6 @@ import (
 
 func ReadYamlFile(filename string) map[string]interface{} {
 	mapData := make(map[string]interface{})
-
 	fileDataByte, err := ioutil.ReadFile(filename)
 	if err != nil {
 		Log.Warn("read file error: ", err)

@@ -38,6 +38,6 @@ func (mf *MyFormatter) Format(entry *log.Entry) ([]byte, error) {
 	if fLen = utf8.RuneCountInString(file); fLen > 3 {
 		fLen = fLen - 3
 	}
-	msg := fmt.Sprintf("%s [%3s][%+15v:%4d][GOID:%3d] %s\n", timestamp, strings.ToUpper(entry.Level.String()), file[:fLen], len, getGID(), entry.Message)
+	msg := fmt.Sprintf("%s [%3.3s][%+15.15v:%4.4d][GOID:%3.3d] %s\n", timestamp, strings.ToUpper(entry.Level.String()), file[:fLen], len, getGID(), entry.Message)
 	return []byte(msg), nil
 }

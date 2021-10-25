@@ -2,8 +2,8 @@ package serialize
 
 import (
 	"github.com/jinzhu/gorm"
-	"os"
 	"github.com/qkgo/scaff/pkg/cfg"
+	"os"
 	"time"
 )
 
@@ -40,7 +40,7 @@ func ConfigSecondDatabase(dialect string, url string) {
 	db, err := gorm.Open(dialect, url)
 	if err != nil {
 		println("Got error when connect database, the error is ", err.Error())
-		cfg.Log.Fatalf("Got error when connect database, the error is ", err)
+		cfg.Log.Fatalf("Got error when connect database, the error is %v", err)
 		time.Sleep(time.Second)
 		os.Exit(-200)
 		return

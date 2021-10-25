@@ -7,13 +7,13 @@ import (
 	"strconv"
 )
 
+
 func InitializationStorageRedis(c *config.Config) {
 	addr := c.GetString("db.redis.storage.host")
 	cfg.Log.Info(addr)
 	port := c.GetInt("db.redis.storage.port")
 	cfg.Log.Info(port)
 	password := c.GetString("db.redis.storage.password")
-	cfg.Log.Info(password)
 	selectDb := c.GetInt("db.redis.storage.select")
 	cfg.Log.Info(selectDb)
 	portInt := strconv.Itoa(port)

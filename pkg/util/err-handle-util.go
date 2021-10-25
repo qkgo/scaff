@@ -1,6 +1,7 @@
 package util
 
 import (
+	"crypto/md5"
 	"github.com/gin-gonic/gin"
 	"github.com/qkgo/scaff/pkg/cfg"
 )
@@ -14,7 +15,7 @@ func ErrorCatch(err error, errorMessage string, c *gin.Context) bool {
 	c.JSON(400, map[string]interface{}{
 		"error":       errorMessage,
 		"success":     false,
-		"code":        MD5([]byte(errorMessage)),
+		"code":        md5.Sum([]byte(errorMessage)),
 		"errorDetail": err.Error(),
 		"data":        nil,
 	})
@@ -31,7 +32,7 @@ func ErrorCatchEncryption(err error, errorMessage string, c *gin.Context) bool {
 	EncryptionSend(200, map[string]interface{}{
 		"error":       errorMessage,
 		"success":     false,
-		"code":        MD5([]byte(errorMessage)),
+		"code":        md5.Sum([]byte(errorMessage)),
 		"errorDetail": err.Error(),
 		"data":        nil,
 	}, c)
