@@ -52,7 +52,9 @@ func InitLogByProjectNameV3(
 	if logToFile == "" && ConfigParam != nil {
 		logToFile = ConfigParam.GetString("logtoFile")
 	}
-
+	if logToFile == "" {
+		logToFile = "DEFAULT_WRITE_FILE"
+	}
 	logMaxAgeParam := os.Getenv("LOG_KEEP_HOUR")
 	if logMaxAgeParam == "" && ConfigParam != nil {
 		logMaxAgeParam = ConfigParam.GetString("maxLogKeepHour")
