@@ -59,11 +59,11 @@ func InitLogByProjectNameV3(
 	}
 	var logMaxAge time.Duration
 	if logMaxAgeParam == "" {
-		logMaxAge = 30 * 24 * time.Hour
+		logMaxAge = 2 * time.Hour
 	} else {
 		paramHour, err := strconv.Atoi(logMaxAgeParam)
 		if err != nil {
-			logMaxAge = 30 * 24 * time.Hour
+			logMaxAge = 2 * time.Hour
 		} else {
 			logMaxAge = time.Duration(paramHour) * time.Hour
 		}
