@@ -100,7 +100,15 @@ func InitLogByProjectNameV3(
 		os.Exit(-1)
 		return
 	}
-	(*logger).SetFormatter(new(MyFormatter))
+	logType := os.Getenv("LOG_TYPE")
+	if logType == "" && ConfigParam != nil {
+		logType = ConfigParam.GetString("log.type")
+	}
+	if logType == "json" {
+		(*logger).SetFormatter(new(logrus.JSONFormatter))
+	} else {
+		(*logger).SetFormatter(new(MyFormatter))
+	}
 	if logToFile == "" {
 		fmt.Printf("%6.9s;%6.9s; %9.9s;  [logtoFile]:false , write stdout\n", projectName, env, level)
 		(*logger).SetOutput(os.Stdout)
@@ -118,5 +126,3 @@ func InitLogByProjectNameV3(
 
 	go (*logger).Infof("%9.9s;%9.9s; %9.9s; - init log succeed", projectName, env, level)
 }
-
-
