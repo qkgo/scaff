@@ -1,0 +1,23 @@
+package system
+
+import (
+	"fmt"
+	"os"
+	"runtime/debug"
+)
+
+func Exit(exitCode ...int) {
+	fmt.Printf("exit stack: %+v \n", debug.Stack())
+	os.Exit(exitCode[0])
+	return
+}
+
+func ExIt(i ...int) {
+	stacks := debug.Stack()
+	fmt.Printf("exit stack: %s \n", stacks)
+	if GO111MODULE() {
+		return
+	}
+	os.Exit(i[0])
+	return
+}

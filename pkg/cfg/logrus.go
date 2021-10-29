@@ -3,6 +3,7 @@ package cfg
 import (
 	"fmt"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
+	"github.com/qkgo/scaff/pkg/util/system"
 	"io"
 	"os"
 	"path"
@@ -30,19 +31,12 @@ func InitLogByProjectNameV3(
 	printConsole bool) {
 	if projectName == "" {
 		println("projectName is not define")
-		os.Exit(-1)
+		system.Exit(-1)
 		return
 	}
-	baseLogPath := ConfigParam.GetString("log.path." + projectName)
+	baseLogPath := getOutputPath(projectName)
 	if baseLogPath == "" {
-		println("baseLogPath is not define")
-		currentPath, err := os.Getwd()
-		if err != nil {
-			println("os.Getwd() shutdown. err:", err.Error())
-			os.Exit(-1)
-			return
-		}
-		baseLogPath = path.Join(currentPath, "logs")
+		return
 	}
 	env := os.Getenv("ENV")
 	if env == "" && ConfigParam != nil {
@@ -74,12 +68,16 @@ func InitLogByProjectNameV3(
 	*logger = logrus.New()
 	(*logger).SetReportCaller(true)
 	os.MkdirAll(baseLogPath, os.ModePerm)
-	var filename string
+	filename := ""
 	if env != "" {
 		filename = projectName + "-" + env
-	}
-	if level != "" {
-		filename = filename + "-" + level
+		if level != "" {
+			filename = filename + "-" + level
+		}
+	} else if level != "" {
+		filename = projectName + "-" + level
+	} else {
+		filename = projectName
 	}
 	filename = filename + ".%Y-%m-%d-%H.log"
 	logFilePath := path.Join(baseLogPath, filename)
@@ -97,7 +95,7 @@ func InitLogByProjectNameV3(
 	if err != nil {
 		println("config local file system logger error:", err.Error())
 		fmt.Printf("config local file system logger error: %v", errors.WithStack(err))
-		os.Exit(-1)
+		system.Exit(-1)
 		return
 	}
 	logType := os.Getenv("LOG_TYPE")
@@ -125,4 +123,29 @@ func InitLogByProjectNameV3(
 	}
 
 	go (*logger).Infof("%9.9s;%9.9s; %9.9s; - init log succeed", projectName, env, level)
+}
+
+func getOutputPath(projectName string) string {
+	if ConfigParam != nil {
+		baseLogPath := ConfigParam.GetString("log.path." + projectName)
+		if baseLogPath == "" {
+			println("baseLogPath is not define")
+			currentPath, err := os.Getwd()
+			if err != nil {
+				println("os.Getwd() shutdown. err:", err.Error())
+				system.Exit(-1)
+				return ""
+			}
+			return path.Join(currentPath, "logs")
+		}
+		return baseLogPath
+	} else {
+		currentPath, err := os.Getwd()
+		if err != nil {
+			println("os.Getwd() shutdown. err:", err.Error())
+			system.Exit(-1)
+			return ""
+		}
+		return path.Join(currentPath, "logs")
+	}
 }

@@ -1,8 +1,8 @@
 package cfg
 
 import (
+	"github.com/qkgo/scaff/pkg/util/system"
 	"log"
-	"os"
 )
 
 type ParamLike struct {
@@ -29,7 +29,7 @@ func ParseConfigEx(args ParamLike) map[string]interface{} {
 		env := Configuration["env"].(string)
 		if env == "" {
 			log.Println("local specify config failed")
-			os.Exit(-2)
+			system.Exit(-2)
 			return nil
 		}
 		return Configuration
@@ -40,7 +40,7 @@ func ParseConfigEx(args ParamLike) map[string]interface{} {
 		env := Configuration["env"].(string)
 		if env == "" {
 			log.Println("local specify config failed")
-			os.Exit(-4)
+			system.Exit(-4)
 			return nil
 		} else {
 			log.Println("local specify config finish,current: ", env)
@@ -48,7 +48,7 @@ func ParseConfigEx(args ParamLike) map[string]interface{} {
 		}
 	} else {
 		log.Println("local specify config no found")
-		os.Exit(-3)
+		system.Exit(-3)
 		return nil
 	}
 }
@@ -76,19 +76,19 @@ func ParseConfig(args ParamLike) {
 		if loadConfigToGlobal(args.Config) {
 			if env := ConfigParam.GetString("env"); env == "" {
 				log.Println("local specify config failed")
-				os.Exit(-1)
+				system.Exit(-1)
 			} else {
 				log.Println("load config finish, current: ", env)
 				return
 			}
 			return
 		} else {
-			os.Exit(-2)
+			system.Exit(-2)
 			return
 		}
 	} else {
 		log.Println("local specify config no found")
-		os.Exit(-3)
+		system.Exit(-3)
 		return
 	}
 }

@@ -3,7 +3,7 @@ package serialize
 import (
 	"github.com/jinzhu/gorm"
 	"github.com/qkgo/scaff/pkg/cfg"
-	"os"
+	"github.com/qkgo/scaff/pkg/util/system"
 	"time"
 )
 
@@ -11,7 +11,7 @@ func ConfigDatabase(dialect string, url string) {
 	if dialect == "" || url == "" {
 		println("connect database param is null.")
 		cfg.Log.Fatalf("connect database param is null.")
-		os.Exit(-100)
+		system.Exit(-100)
 		return
 	}
 	db, err := gorm.Open(dialect, url)
@@ -19,7 +19,7 @@ func ConfigDatabase(dialect string, url string) {
 		println("Got error when connect database, the error is ", err.Error())
 		cfg.Log.Fatalf("Got error when connect database, the error is '%v'", err)
 		time.Sleep(time.Second)
-		os.Exit(-200)
+		system.Exit(-200)
 		return
 	}
 	db.LogMode(true)
@@ -34,7 +34,7 @@ func ConfigSecondDatabase(dialect string, url string) {
 	if dialect == "" || url == "" {
 		println("connect database param is null.")
 		cfg.Log.Fatalf("connect database param is null.")
-		os.Exit(-100)
+		system.Exit(-100)
 		return
 	}
 	db, err := gorm.Open(dialect, url)
@@ -42,7 +42,7 @@ func ConfigSecondDatabase(dialect string, url string) {
 		println("Got error when connect database, the error is ", err.Error())
 		cfg.Log.Fatalf("Got error when connect database, the error is %v", err)
 		time.Sleep(time.Second)
-		os.Exit(-200)
+		system.Exit(-200)
 		return
 	}
 	db.LogMode(true)
