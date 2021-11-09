@@ -1,12 +1,15 @@
 package util
 
 import (
-	"encoding/json"
 	"fmt"
+	//"encoding/json"
+	jsoniter "github.com/json-iterator/go"
+	"github.com/qkgo/scaff/pkg/cfg"
 	"log"
 	"reflect"
-	"github.com/qkgo/scaff/pkg/cfg"
 )
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 func JsonParse(input interface{}) []byte {
 	var jsonByte []byte

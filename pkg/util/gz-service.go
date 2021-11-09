@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"errors"
-	"github.com/aliyun/aliyun-oss-go-sdk/oss"
+	"github.com/qkgo/aliyun-oss-go-sdk/oss"
 	"github.com/djherbis/buffer"
 	"github.com/qkgo/scaff/pkg/cfg"
 	"github.com/smallnest/ringbuffer"
@@ -244,13 +244,15 @@ func writeFile(memoryTarWriter io.Writer, fileInformation *UploadFileInformation
 }
 
 func UploadToOss(ossConnection *oss.Client, ossBucket *oss.Bucket, writer io.Writer, fileUrl string) (*oss.Response, error) {
-	resp, err := ossBucket.PutObject(fileUrl, writer.(io.Reader), nil)
+	resp, err := ossBucket.PutObjectV2(fileUrl, writer.(io.Reader), nil)
 	if err != nil {
 		return nil, err
 	} else {
 		cfg.LogInfo.Info(resp)
 		return resp, nil
 	}
+	//err := ossBucket.PutObject(fileUrl, writer.(io.Reader), nil)
+	//return nil, err
 }
 
 func ReParkFile(OssSavedObject *io.Reader, fileInformation *UploadFileInformation) (io.Writer, error) {
