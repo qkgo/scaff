@@ -244,7 +244,7 @@ func writeFile(memoryTarWriter io.Writer, fileInformation *UploadFileInformation
 }
 
 func UploadToOss(ossConnection *oss.Client, ossBucket *oss.Bucket, writer io.Writer, fileUrl string) (*oss.Response, error) {
-	resp, err := ossBucket.PutObject(fileUrl, writer.(io.Reader), nil)
+	resp, err := ossBucket.PutObjectV2(fileUrl, writer.(io.Reader), nil)
 	if err != nil {
 		return nil, err
 	} else {
