@@ -3,7 +3,6 @@ package util
 import (
 	"bytes"
 	"encoding/base64"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
@@ -166,7 +165,7 @@ func EncryptionStreamSend(code int, result []byte, context *gin.Context) {
 	if err != nil {
 		cfg.LogInfo.Info(err)
 		context.Header("Content-Type", "application/octet-stream")
-		context.Data(400, "application/octet-stream", []byte( "Error"))
+		context.Data(400, "application/octet-stream", []byte("Error"))
 		return
 	}
 	resultString := base64.StdEncoding.EncodeToString(stringRequest)
