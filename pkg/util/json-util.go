@@ -2,7 +2,6 @@ package util
 
 import (
 	"fmt"
-	//"encoding/json"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/qkgo/scaff/pkg/cfg"
 	"log"
