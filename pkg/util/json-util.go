@@ -4,6 +4,7 @@ import (
 	"fmt"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/qkgo/scaff/pkg/cfg"
+	"github.com/qkgo/scaff/pkg/util/system"
 	"log"
 	"reflect"
 )
@@ -54,4 +55,21 @@ func JsonQuickParse(input interface{}) []byte {
 		}
 	}
 	return jsonByte
+}
+
+func MustJSONDecode(b []byte, i interface{}) {
+	err := json.Unmarshal(b, i)
+	if err != nil {
+		log.Printf("decode json error: %v \n", err)
+	}
+}
+
+func Get(inputBytes []byte, expectObject interface{}) interface{} {
+	objType := reflect.TypeOf(expectObject).Elem()
+	resultObject := reflect.New(objType).Interface()
+	MustJSONDecode(inputBytes, &resultObject)
+	if system.GO111MODULE() {
+		log.Printf("json unmarshal resultObject = %#v \n", resultObject)
+	}
+	return resultObject
 }
