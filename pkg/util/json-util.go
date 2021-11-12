@@ -3,6 +3,7 @@ package util
 import (
 	"fmt"
 	jsoniter "github.com/json-iterator/go"
+	"github.com/modern-go/reflect2"
 	"github.com/qkgo/scaff/pkg/cfg"
 	"github.com/qkgo/scaff/pkg/util/system"
 	"log"
@@ -57,6 +58,7 @@ func JsonQuickParse(input interface{}) []byte {
 	return jsonByte
 }
 
+<<<<<<< Updated upstream
 func MustJSONDecode(b []byte, i interface{}) {
 	err := json.Unmarshal(b, i)
 	if err != nil {
@@ -72,4 +74,32 @@ func Get(inputBytes []byte, expectObject interface{}) interface{} {
 		log.Printf("json unmarshal resultObject = %#v \n", resultObject)
 	}
 	return resultObject
+=======
+func MustJSONDecode(b []byte, i interface{}) (err error) {
+	err = json.Unmarshal(b, i)
+	if err != nil {
+		log.Printf("decode json error: %v \n", err)
+	}
+	return
+}
+
+func Get(inputBytes []byte, inputType interface{}) (i interface{}, err error) {
+	typed := reflect2.TypeOf(inputType)
+	newObject := typed.New()
+	err = MustJSONDecode(inputBytes, &newObject)
+	if system.GO111MODULE() {
+		log.Printf("json unmarshal resultObject = %+v \n", newObject)
+	}
+	return newObject, err
+}
+
+func GetWithoutError(inputBytes []byte, inputType interface{}) (i interface{}, err error) {
+	typed := reflect2.TypeOf(inputType)
+	newObject := typed.New()
+	err = MustJSONDecode(inputBytes, &newObject)
+	if system.GO111MODULE() {
+		log.Printf("json unmarshal resultObject = %+v \n", newObject)
+	}
+	return newObject, err
+>>>>>>> Stashed changes
 }
