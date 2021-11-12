@@ -58,23 +58,6 @@ func JsonQuickParse(input interface{}) []byte {
 	return jsonByte
 }
 
-<<<<<<< Updated upstream
-func MustJSONDecode(b []byte, i interface{}) {
-	err := json.Unmarshal(b, i)
-	if err != nil {
-		log.Printf("decode json error: %v \n", err)
-	}
-}
-
-func Get(inputBytes []byte, expectObject interface{}) interface{} {
-	objType := reflect.TypeOf(expectObject).Elem()
-	resultObject := reflect.New(objType).Interface()
-	MustJSONDecode(inputBytes, &resultObject)
-	if system.GO111MODULE() {
-		log.Printf("json unmarshal resultObject = %#v \n", resultObject)
-	}
-	return resultObject
-=======
 func MustJSONDecode(b []byte, i interface{}) (err error) {
 	err = json.Unmarshal(b, i)
 	if err != nil {
@@ -93,13 +76,15 @@ func Get(inputBytes []byte, inputType interface{}) (i interface{}, err error) {
 	return newObject, err
 }
 
-func GetWithoutError(inputBytes []byte, inputType interface{}) (i interface{}, err error) {
+func GetWithoutError(inputBytes []byte, inputType interface{}) (i interface{}) {
 	typed := reflect2.TypeOf(inputType)
 	newObject := typed.New()
-	err = MustJSONDecode(inputBytes, &newObject)
+	err := MustJSONDecode(inputBytes, &newObject)
+	if err != nil {
+		log.Printf("parse object from byts failed: %+v \n", err)
+	}
 	if system.GO111MODULE() {
 		log.Printf("json unmarshal resultObject = %+v \n", newObject)
 	}
-	return newObject, err
->>>>>>> Stashed changes
+	return newObject
 }
