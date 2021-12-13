@@ -22,8 +22,10 @@ require (
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/lestrrat-go/strftime v1.0.5 // indirect
 	github.com/mattn/go-sqlite3 v2.0.1+incompatible // indirect
+	github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742
 	github.com/pkg/errors v0.9.1
 	github.com/qkgo/aliyun-oss-go-sdk v1.9.9-0.20211109100850-9de9a45ddcd1
+	github.com/ricochet2200/go-disk-usage/du v0.0.0-20210707232629-ac9918953285
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/sirupsen/logrus v1.8.1
 	github.com/smallnest/ringbuffer v0.0.0-20210227121335-0a58434b36f2
