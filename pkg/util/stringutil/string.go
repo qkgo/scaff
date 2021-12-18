@@ -1,4 +1,4 @@
-package compares
+package stringutil
 
 import "strings"
 
