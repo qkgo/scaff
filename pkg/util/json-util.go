@@ -13,6 +13,9 @@ import (
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 func JsonParse(input interface{}) []byte {
+	if true {
+		return JsonQuickParse(input)
+	}
 	var jsonByte []byte
 	defer func() []byte {
 		if err := recover(); err != nil {
