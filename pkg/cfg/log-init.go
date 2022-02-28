@@ -6,4 +6,5 @@ func InitLog(projectName string) {
 	InitLogByProjectNameV3(&LogHttp, projectName, "http", true)
 	InitLogByProjectNameV3(&LogRpc, projectName, "key", true)
 	InitLogByProjectNameV3(&SqlLog, projectName, "sql", true)
+	InitLogByProjectNameV3(&Log, projectName, "default", true)
 }
