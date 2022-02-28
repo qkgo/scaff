@@ -4,6 +4,8 @@ import (
 	"context"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/qkgo/scaff/pkg/cfg"
+	"github.com/qkgo/scaff/pkg/util/crypt"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 	"io/ioutil"
@@ -11,7 +13,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"github.com/qkgo/scaff/pkg/cfg"
 	"syscall"
 	"time"
 )
@@ -87,12 +88,12 @@ func GetRouter(
 	}
 	if needCrypto {
 		if cfg.OzConfig.IsProduction() {
-			router.Use(QuietCrypto())
+			router.Use(crypt.QuietCrypto())
 		} else {
-			router.Use(Crypto())
+			router.Use(crypt.Crypto())
 		}
 	}
-	router.Use(TokenRole())
+	router.Use(crypt.TokenRole())
 	router.Use(VersionHandler())
 	router.NoRoute(NoRouterHandle())
 	router.NoMethod(NoMethodHandle())
