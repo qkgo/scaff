@@ -18,10 +18,10 @@ import (
 var tokenKey []byte
 var mpKey []byte
 
+type CryptFunc func(input []byte) ([]byte, error)
+
 var decryptFunc CryptFunc
 var encryptFunc CryptFunc
-
-type CryptFunc func(input ...[]byte) ([]byte, error)
 
 func SetCryptFunc(
 	decrypt CryptFunc,
@@ -119,12 +119,12 @@ func GetDecryptedString(context *gin.Context) []byte {
 
 func EncryptionString(jsonRes string) (string, error) {
 	if !cfg.OzConfig.GetCryptoOption() {
-		return string(jsonRes), nil
+		return jsonRes, nil
 	}
 	if encryptFunc == nil {
 		return jsonRes, nil
 	}
-	stringRequest, err := encryptFunc([]byte(jsonRes), mpKey)
+	stringRequest, err := encryptFunc([]byte(jsonRes))
 	if err != nil {
 		return "", err
 	}
@@ -140,7 +140,7 @@ func EncryptionInterface(resultJson map[string]interface{}) (string, error) {
 	if encryptFunc == nil {
 		return string(jsonRes), nil
 	}
-	stringRequest, err := encryptFunc(jsonRes, mpKey)
+	stringRequest, err := encryptFunc(jsonRes)
 	if err != nil {
 		return "", err
 	}
@@ -156,7 +156,7 @@ func EncryptionInterfaceLog(resultJson map[string]interface{}) string {
 	if encryptFunc == nil {
 		return string(jsonRes)
 	}
-	stringRequest, err := encryptFunc(jsonRes, mpKey)
+	stringRequest, err := encryptFunc(jsonRes)
 	if err != nil {
 		cfg.LogInfo.Info(err)
 		return ""
@@ -178,7 +178,7 @@ func EncryptionSend(code int, resultJson map[string]interface{}, context *gin.Co
 		return
 	}
 	responseByte := []byte(jsonRes)
-	stringRequest, err := encryptFunc(responseByte, mpKey)
+	stringRequest, err := encryptFunc(responseByte)
 	if err != nil {
 		cfg.LogInfo.Info(err)
 		context.Header("Content-Type", "application/octet-stream")
@@ -195,7 +195,7 @@ func EncryptionStreamSend(code int, result []byte, context *gin.Context) {
 		context.Data(code, "application/octet-stream", result)
 		return
 	}
-	stringRequest, err := encryptFunc(result, mpKey)
+	stringRequest, err := encryptFunc(result)
 	if err != nil {
 		cfg.LogInfo.Info(err)
 		context.Header("Content-Type", "application/octet-stream")
@@ -209,7 +209,7 @@ func EncryptionStreamSend(code int, result []byte, context *gin.Context) {
 }
 
 func EncryptionByte(resultStr []byte) (string, error) {
-	stringRequest, err := encryptFunc(resultStr, mpKey)
+	stringRequest, err := encryptFunc(resultStr)
 	if err != nil {
 		return "", err
 	}
@@ -218,7 +218,7 @@ func EncryptionByte(resultStr []byte) (string, error) {
 }
 
 func EncryptionByteNoError(resultStr []byte) string {
-	stringRequest, err := encryptFunc(resultStr, mpKey)
+	stringRequest, err := encryptFunc(resultStr)
 	if err != nil {
 		cfg.LogInfo.Info(err)
 		return ""
