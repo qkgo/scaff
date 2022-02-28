@@ -1,13 +1,15 @@
-package util
+package crypt
 
 import (
 	"bytes"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/qkgo/scaff/pkg/cfg"
+	"github.com/qkgo/scaff/pkg/util"
 	"io/ioutil"
 	"strconv"
 	"time"
@@ -16,12 +18,14 @@ import (
 var tokenKey []byte
 var mpKey []byte
 
-var decryptFunc func(input ...[]byte) ([]byte, error)
-var encryptFunc func(input ...[]byte) ([]byte, error)
+var decryptFunc CryptFunc
+var encryptFunc CryptFunc
+
+type CryptFunc func(input ...[]byte) ([]byte, error)
 
 func SetCryptFunc(
-	decrypt func(input ...[]byte) ([]byte, error),
-	encrypt func(input ...[]byte) ([]byte, error)) {
+	decrypt CryptFunc,
+	encrypt CryptFunc) {
 	decryptFunc = decrypt
 	encryptFunc = encrypt
 }
@@ -254,7 +258,7 @@ func Crypto() gin.HandlerFunc {
 		c.Writer = blw
 		c.Header("Content-Type", "application/octet-stream")
 		endTime := time.Now()
-		distance := fmt.Sprintf("%.3f", float64(endTime.Sub(startTime).Nanoseconds())/nanoSecondRate)
+		distance := fmt.Sprintf("%.3f", float64(endTime.Sub(startTime).Nanoseconds())/util.NanoSecondRate)
 		email, err := c.Get("email")
 		if err {
 			email = "-"
@@ -333,7 +337,7 @@ func CryptPrivate() gin.HandlerFunc {
 		c.Writer = blw
 		c.Header("Content-Type", "application/octet-stream")
 		endTime := time.Now()
-		distance := fmt.Sprintf("%.3f", float64(endTime.Sub(startTime).Nanoseconds())/nanoSecondRate)
+		distance := fmt.Sprintf("%.3f", float64(endTime.Sub(startTime).Nanoseconds())/util.NanoSecondRate)
 		println("id:", startTime.UnixNano(), ",req:", c.Request.RequestURI, ",method:", c.Request.Method, ",by:", tokenMap.Email, ",ip:", c.Request.RemoteAddr, ",t2:", distance, "s")
 		cfg.LogInfo.Info("id:", startTime.UnixNano(), ",req:", c.Request.RequestURI, ",method:", c.Request.Method, ",by:", tokenMap.Email, "ip:", c.Request.RemoteAddr, ",t2:", distance, "s")
 		return
@@ -439,7 +443,6 @@ func CheckTokenString(tokenString string) (*SignData, error) {
 }
 
 func CheckToken(context *gin.Context) (*SignData, error) {
-
 	tokenString, err := context.Cookie("token")
 	if err != nil || tokenString == "" {
 		tokenString = context.GetHeader("token")
