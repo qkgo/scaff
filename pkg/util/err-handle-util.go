@@ -2,8 +2,10 @@ package util
 
 import (
 	"crypto/md5"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/qkgo/scaff/pkg/cfg"
+	"io"
 )
 
 func ErrorCatch(err error, errorMessage string, c *gin.Context) bool {
@@ -37,4 +39,11 @@ func ErrorCatchEncryption(err error, errorMessage string, c *gin.Context) bool {
 		"data":        nil,
 	}, c)
 	return true
+}
+
+func MD5(str string) string {
+	w := md5.New()
+	io.WriteString(w, str)
+	md5str := fmt.Sprintf("%x", w.Sum(nil))
+	return md5str
 }
