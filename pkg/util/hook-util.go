@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/qkgo/scaff/pkg/cfg"
+	"github.com/qkgo/scaff/pkg/util/seconds"
 	"gopkg.in/resty.v1"
 	"time"
 )
@@ -13,8 +14,6 @@ var validationServerHost string
 var hookServerHost string
 
 var QueryPathMapper = map[string]string{}
-
-const NanoSecondRate float64 = 1000000000
 
 func InitValidationServerHost() string {
 	if validationServerHost != "" {
@@ -91,7 +90,7 @@ func callRemoteHookServer(hookUrl string, hookPath string, requestBody string, t
 			SetBody(requestBody).
 			Post(hookUrl)
 		endTime := time.Now()
-		distance := fmt.Sprintf("%.3f", float64(endTime.Sub(startTime).Nanoseconds())/NanoSecondRate)
+		distance := fmt.Sprintf("%.3f", float64(endTime.Sub(startTime).Nanoseconds())/seconds.NanoSecondRate)
 		if err != nil {
 			println("resp.webhookurl:", hookUrl, ".error:", err.Error(), "t2:",
 				distance, "s")
@@ -115,7 +114,7 @@ func callRemoteHookServer(hookUrl string, hookPath string, requestBody string, t
 		SetBody(requestBody).
 		Post(secondUrl)
 	endTime := time.Now()
-	distance := fmt.Sprintf("%.3f", float64(endTime.Sub(startTime).Nanoseconds())/NanoSecondRate)
+	distance := fmt.Sprintf("%.3f", float64(endTime.Sub(startTime).Nanoseconds())/seconds.NanoSecondRate)
 	if err != nil {
 		println("resp.webhookurl:", hookUrl, ".error:", err.Error(), "t2:",
 			distance, "s")
