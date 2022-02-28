@@ -9,7 +9,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/qkgo/scaff/pkg/cfg"
-	"github.com/qkgo/scaff/pkg/util"
+	"github.com/qkgo/scaff/pkg/util/seconds"
 	"io/ioutil"
 	"strconv"
 	"time"
@@ -258,7 +258,7 @@ func Crypto() gin.HandlerFunc {
 		c.Writer = blw
 		c.Header("Content-Type", "application/octet-stream")
 		endTime := time.Now()
-		distance := fmt.Sprintf("%.3f", float64(endTime.Sub(startTime).Nanoseconds())/util.NanoSecondRate)
+		distance := fmt.Sprintf("%.3f", float64(endTime.Sub(startTime).Nanoseconds())/seconds.NanoSecondRate)
 		email, err := c.Get("email")
 		if err {
 			email = "-"
@@ -337,7 +337,7 @@ func CryptPrivate() gin.HandlerFunc {
 		c.Writer = blw
 		c.Header("Content-Type", "application/octet-stream")
 		endTime := time.Now()
-		distance := fmt.Sprintf("%.3f", float64(endTime.Sub(startTime).Nanoseconds())/util.NanoSecondRate)
+		distance := fmt.Sprintf("%.3f", float64(endTime.Sub(startTime).Nanoseconds())/seconds.NanoSecondRate)
 		println("id:", startTime.UnixNano(), ",req:", c.Request.RequestURI, ",method:", c.Request.Method, ",by:", tokenMap.Email, ",ip:", c.Request.RemoteAddr, ",t2:", distance, "s")
 		cfg.LogInfo.Info("id:", startTime.UnixNano(), ",req:", c.Request.RequestURI, ",method:", c.Request.Method, ",by:", tokenMap.Email, "ip:", c.Request.RemoteAddr, ",t2:", distance, "s")
 		return
