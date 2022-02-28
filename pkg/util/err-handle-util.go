@@ -42,7 +42,7 @@ func ErrorCatchEncryption(err error, errorMessage string, c *gin.Context) bool {
 	return true
 }
 
-func md5Sum(str string) string {
+func Md5Sum(str string) string {
 	w := md5.New()
 	io.WriteString(w, str)
 	md5str := fmt.Sprintf("%x", w.Sum(nil))
