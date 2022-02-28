@@ -24,10 +24,11 @@ var decryptFunc CryptFunc
 var encryptFunc CryptFunc
 
 func SetCryptFunc(
-	decrypt CryptFunc,
-	encrypt CryptFunc) {
-	decryptFunc = decrypt
-	encryptFunc = encrypt
+	crypt ...CryptFunc) {
+	if len(crypt) > 1 {
+		decryptFunc = crypt[0]
+		encryptFunc = crypt[1]
+	}
 }
 
 func DecryptionByte(encryptionData string) []byte {
