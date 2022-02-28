@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/qkgo/scaff/pkg/cfg"
 	"io/ioutil"
-	"os"
 	"strconv"
 	"time"
 )
@@ -17,11 +16,14 @@ import (
 var tokenKey []byte
 var mpKey []byte
 
-func init() {
-	mpKey = []byte(os.Getenv("GXK"))
-	tokenKey = []byte(os.Getenv("TOKENKEY"))
-	println(string(mpKey))
-	println(string(tokenKey))
+var decryptFunc func(input ...[]byte) ([]byte, error)
+var encryptFunc func(input ...[]byte) ([]byte, error)
+
+func SetCryptFunc(
+	decrypt func(input ...[]byte) ([]byte, error),
+	encrypt func(input ...[]byte) ([]byte, error)) {
+	decryptFunc = decrypt
+	encryptFunc = encrypt
 }
 
 func DecryptionByte(encryptionData string) []byte {
@@ -30,7 +32,10 @@ func DecryptionByte(encryptionData string) []byte {
 		cfg.LogInfo.Info(err)
 		return nil
 	}
-	stringRequest, err := ZmpDecrypt(originString, mpKey)
+	if decryptFunc == nil {
+		return originString
+	}
+	stringRequest, err := decryptFunc(originString)
 	if err != nil {
 		cfg.LogInfo.Info(err)
 		return nil
@@ -44,7 +49,10 @@ func DecryptionByteArray(encryptionData []byte) []byte {
 		cfg.LogInfo.Info(err)
 		return nil
 	}
-	stringRequest, err := ZmpDecrypt(originString, mpKey)
+	if decryptFunc == nil {
+		return originString
+	}
+	stringRequest, err := decryptFunc(originString)
 	if err != nil {
 		cfg.LogInfo.Info(err)
 		return nil
@@ -77,6 +85,9 @@ func GetDecryptedString(context *gin.Context) []byte {
 	if !cfg.OzConfig.GetCryptoOption() {
 		return cryptoData
 	}
+	if decryptFunc == nil {
+		return cryptoData
+	}
 	originString, err := base64.StdEncoding.DecodeString(string(cryptoData))
 	if err != nil {
 		cfg.LogInfo.Info(err)
@@ -88,7 +99,7 @@ func GetDecryptedString(context *gin.Context) []byte {
 		})
 		return nil
 	}
-	stringRequest, err := ZmpDecrypt(originString, mpKey)
+	stringRequest, err := decryptFunc(originString)
 	if err != nil {
 		cfg.LogInfo.Info(err)
 		context.Abort()
@@ -106,7 +117,10 @@ func EncryptionString(jsonRes string) (string, error) {
 	if !cfg.OzConfig.GetCryptoOption() {
 		return string(jsonRes), nil
 	}
-	stringRequest, err := ZmpEncrypt([]byte(jsonRes), mpKey)
+	if encryptFunc == nil {
+		return jsonRes, nil
+	}
+	stringRequest, err := encryptFunc([]byte(jsonRes), mpKey)
 	if err != nil {
 		return "", err
 	}
@@ -119,7 +133,10 @@ func EncryptionInterface(resultJson map[string]interface{}) (string, error) {
 	if !cfg.OzConfig.GetCryptoOption() {
 		return string(jsonRes), nil
 	}
-	stringRequest, err := ZmpEncrypt(jsonRes, mpKey)
+	if encryptFunc == nil {
+		return string(jsonRes), nil
+	}
+	stringRequest, err := encryptFunc(jsonRes, mpKey)
 	if err != nil {
 		return "", err
 	}
@@ -132,7 +149,10 @@ func EncryptionInterfaceLog(resultJson map[string]interface{}) string {
 	if !cfg.OzConfig.GetCryptoOption() {
 		return string(jsonRes)
 	}
-	stringRequest, err := ZmpEncrypt(jsonRes, mpKey)
+	if encryptFunc == nil {
+		return string(jsonRes)
+	}
+	stringRequest, err := encryptFunc(jsonRes, mpKey)
 	if err != nil {
 		cfg.LogInfo.Info(err)
 		return ""
@@ -148,8 +168,13 @@ func EncryptionSend(code int, resultJson map[string]interface{}, context *gin.Co
 		context.Data(code, "application/octet-stream", jsonRes)
 		return
 	}
+	if encryptFunc == nil {
+		context.Header("Content-Type", "application/octet-stream")
+		context.Data(code, "application/octet-stream", jsonRes)
+		return
+	}
 	responseByte := []byte(jsonRes)
-	stringRequest, err := ZmpEncrypt(responseByte, mpKey)
+	stringRequest, err := encryptFunc(responseByte, mpKey)
 	if err != nil {
 		cfg.LogInfo.Info(err)
 		context.Header("Content-Type", "application/octet-stream")
@@ -161,7 +186,12 @@ func EncryptionSend(code int, resultJson map[string]interface{}, context *gin.Co
 }
 
 func EncryptionStreamSend(code int, result []byte, context *gin.Context) {
-	stringRequest, err := ZmpEncrypt(result, mpKey)
+	if encryptFunc == nil {
+		context.Header("Content-Type", "application/octet-stream")
+		context.Data(code, "application/octet-stream", result)
+		return
+	}
+	stringRequest, err := encryptFunc(result, mpKey)
 	if err != nil {
 		cfg.LogInfo.Info(err)
 		context.Header("Content-Type", "application/octet-stream")
@@ -175,7 +205,7 @@ func EncryptionStreamSend(code int, result []byte, context *gin.Context) {
 }
 
 func EncryptionByte(resultStr []byte) (string, error) {
-	stringRequest, err := ZmpEncrypt(resultStr, mpKey)
+	stringRequest, err := encryptFunc(resultStr, mpKey)
 	if err != nil {
 		return "", err
 	}
@@ -184,7 +214,7 @@ func EncryptionByte(resultStr []byte) (string, error) {
 }
 
 func EncryptionByteNoError(resultStr []byte) string {
-	stringRequest, err := ZmpEncrypt(resultStr, mpKey)
+	stringRequest, err := encryptFunc(resultStr, mpKey)
 	if err != nil {
 		cfg.LogInfo.Info(err)
 		return ""
@@ -460,4 +490,59 @@ func GetRawString(context *gin.Context) []byte {
 		cfg.LogInfo.Info(err)
 	}
 	return data
+}
+
+func GetDeCryptoString(context *gin.Context) []byte {
+	cryptoData, err := context.GetRawData()
+	if err != nil {
+		cfg.LogInfo.Info(err)
+		context.Abort()
+		context.JSON(401, map[string]interface{}{
+			"success": false,
+			"error":   err.Error(),
+			"code":    -1,
+		})
+		return nil
+	}
+	if cryptoData == nil || len(cryptoData) < 1 {
+		cfg.LogInfo.Info("request data is null")
+		context.Abort()
+		context.JSON(401, map[string]interface{}{
+			"success": false,
+			"error":   "request data is null",
+			"code":    -1,
+		})
+		return nil
+	}
+	if !cfg.OzConfig.GetCryptoOption() {
+		return cryptoData
+	}
+	originString, err := base64.StdEncoding.DecodeString(string(cryptoData))
+	if err != nil {
+		cfg.LogInfo.Info(err)
+		context.Abort()
+		context.JSON(401, map[string]interface{}{
+			"success": false,
+			"error":   err.Error(),
+			"code":    -2,
+		})
+		return nil
+	}
+	if decryptFunc == nil {
+		stringRequest := originString
+		return stringRequest
+	}
+	//cfg.LogInfo.Info(originString)
+	stringRequest, decryptErr := decryptFunc(originString)
+	if decryptErr != nil {
+		cfg.LogInfo.Info(decryptErr)
+		context.Abort()
+		context.JSON(401, map[string]interface{}{
+			"success": false,
+			"error":   decryptErr.Error(),
+			"code":    -3,
+		})
+		return nil
+	}
+	return stringRequest
 }
