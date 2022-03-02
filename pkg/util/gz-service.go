@@ -5,8 +5,8 @@ import (
 	"bytes"
 	"compress/gzip"
 	"errors"
-	"github.com/qkgo/aliyun-oss-go-sdk/oss"
 	"github.com/djherbis/buffer"
+	"github.com/qkgo/aliyun-oss-go-sdk/oss"
 	"github.com/qkgo/scaff/pkg/cfg"
 	"github.com/smallnest/ringbuffer"
 	"io"
@@ -145,7 +145,7 @@ func ReplaceTarGz(OssSavedObject *io.Reader, fileInformation *UploadFileInformat
 		return memoryTarWriter, nil
 	}
 
-	return nil, errors.New("gs-service not implemented")
+	return nil, errors.New("gz not implemented")
 }
 
 type FileInfo struct {
