@@ -124,8 +124,8 @@ func BootstrapHttp(
 		Addr:    addr,
 		Handler: router,
 	}
-
 	go func() {
+		time.Sleep(time.Second * 5)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("listen: %s\n", err)
 		}
