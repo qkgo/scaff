@@ -210,6 +210,9 @@ func EncryptionStreamSend(code int, result []byte, context *gin.Context) {
 }
 
 func EncryptionByte(resultStr []byte) (string, error) {
+	if encryptFunc == nil {
+		return string(resultStr), errors.New("encryptFunc has been call without initialization")
+	}
 	stringRequest, err := encryptFunc(resultStr)
 	if err != nil {
 		return "", err
@@ -219,6 +222,9 @@ func EncryptionByte(resultStr []byte) (string, error) {
 }
 
 func EncryptionByteNoError(resultStr []byte) string {
+	if encryptFunc == nil {
+		return string(resultStr)
+	}
 	stringRequest, err := encryptFunc(resultStr)
 	if err != nil {
 		cfg.LogInfo.Info(err)
@@ -349,6 +355,7 @@ func TokenRole() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := c.GetHeader("token")
 		if tokenString == "" {
+			c.Abort()
 			c.JSON(400, map[string]interface{}{
 				"success": false,
 				"msg":     "token not found in header",
