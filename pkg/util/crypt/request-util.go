@@ -11,12 +11,12 @@ import (
 	"github.com/qkgo/scaff/pkg/cfg"
 	"github.com/qkgo/scaff/pkg/util/seconds"
 	"io/ioutil"
+	"os"
 	"strconv"
 	"time"
 )
 
 var tokenKey []byte
-var mpKey []byte
 
 type CryptFunc func(input []byte) ([]byte, error)
 
@@ -28,6 +28,13 @@ func SetCryptFunc(
 	if len(crypt) > 1 {
 		decryptFunc = crypt[0]
 		encryptFunc = crypt[1]
+	}
+}
+
+func init() {
+	tokenKeyString := os.Getenv("TOKEN_KEY")
+	if tokenKeyString != "" {
+		tokenKey = []byte(tokenKeyString)
 	}
 }
 
