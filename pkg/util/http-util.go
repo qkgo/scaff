@@ -19,6 +19,17 @@ import (
 	"time"
 )
 
+func DefaultView(ctx *gin.Context) {
+	ctx.JSON(200, map[string]interface{}{
+		"success": true,
+		"code":    200,
+		"uri":     ctx.Request.RequestURI,
+		"remote":  ctx.RemoteIP(),
+		"addr":    ctx.Request.RemoteAddr,
+		"host":    ctx.Request.Host,
+	})
+}
+
 func NoRouterHandle() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		context.JSON(404, map[string]interface{}{
@@ -137,6 +148,10 @@ func GetRouter(
 	corsDefault.AllowCredentials = true
 	corsDefault.AllowHeaders = []string{"Origin", "token", "Content-Length", "Content-Type", "session", "DNT", "content-type", "s", "timezone", "tz", "specify", "order"}
 	corsDefault.AllowAllOrigins = true
+	router.GET("/", DefaultView)
+	router.GET("/health", HealthCheckDatabase)
+	router.GET("/health/database", HealthCheckDatabase)
+	router.GET("/hc", HealthCheckDatabase)
 	router.Use(GinToLogrus())
 	router.Use(cors.New(corsDefault))
 	c := gin.LoggerConfig{
@@ -160,9 +175,6 @@ func GetRouter(
 	router.Use(VersionHandler())
 	router.NoRoute(NoRouterHandle())
 	router.NoMethod(NoMethodHandle())
-	router.GET("/health", HealthCheckDatabase)
-	router.GET("/health/database", HealthCheckDatabase)
-	router.GET("/hc", HealthCheckDatabase)
 	if apiRouterConfig != nil {
 		apiRouterConfig(router)
 	}
