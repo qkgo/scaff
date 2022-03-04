@@ -24,7 +24,6 @@ func DefaultView(ctx *gin.Context) {
 		"success": true,
 		"code":    200,
 		"uri":     ctx.Request.RequestURI,
-		"remote":  ctx.RemoteIP(),
 		"addr":    ctx.Request.RemoteAddr,
 		"host":    ctx.Request.Host,
 	})
