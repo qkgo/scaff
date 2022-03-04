@@ -143,9 +143,6 @@ func GetRouter(
 		Output:    ioutil.Discard,
 		SkipPaths: []string{"*"},
 	}
-	router.GET("/health", HealthCheckDatabase)
-	router.GET("/health/database", HealthCheckDatabase)
-	router.GET("/hc", HealthCheckDatabase)
 	router.Use(gin.LoggerWithConfig(c))
 	router.Use(gin.Recovery())
 	router.GET("/doc/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -163,6 +160,9 @@ func GetRouter(
 	router.Use(VersionHandler())
 	router.NoRoute(NoRouterHandle())
 	router.NoMethod(NoMethodHandle())
+	router.GET("/health", HealthCheckDatabase)
+	router.GET("/health/database", HealthCheckDatabase)
+	router.GET("/hc", HealthCheckDatabase)
 	if apiRouterConfig != nil {
 		apiRouterConfig(router)
 	}
