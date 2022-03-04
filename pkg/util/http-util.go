@@ -2,9 +2,11 @@ package util
 
 import (
 	"context"
+	"github.com/alexliesenfeld/health"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/qkgo/scaff/pkg/cfg"
+	"github.com/qkgo/scaff/pkg/serialize"
 	"github.com/qkgo/scaff/pkg/util/crypt"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
@@ -62,6 +64,67 @@ func VersionHandler() gin.HandlerFunc {
 	}
 }
 
+// HealthCheckDatabase
+// @Summary HealthCheckDatabase
+// @Description HealthCheckDatabase
+// @Produce  application/json
+// @Router /health [GET]
+func HealthCheckDatabase(ctx *gin.Context) {
+	var checkerResult health.CheckerResult
+	var checkerResultSecond health.CheckerResult
+	if serialize.DB != nil {
+		checker := health.NewChecker(
+
+			// Set the time-to-live for our cache to 1 second (default).
+			health.WithCacheDuration(1*time.Second),
+
+			// Configure a global timeout that will be applied to all checks.
+			health.WithTimeout(10*time.Second),
+
+			// A check configuration to see if our database connection is up.
+			// The check function will be executed for each HTTP request.
+			health.WithCheck(health.Check{
+				Name:    "database",      // A unique check name.
+				Timeout: 2 * time.Second, // A check specific timeout.
+				Check:   serialize.DB.DB().PingContext,
+			}),
+		)
+		checkerResult = checker.Check(ctx)
+	}
+	if serialize.SecondDB != nil {
+		checkerSecond := health.NewChecker(
+
+			// Set the time-to-live for our cache to 1 second (default).
+			health.WithCacheDuration(1*time.Second),
+
+			// Configure a global timeout that will be applied to all checks.
+			health.WithTimeout(10*time.Second),
+
+			// A check configuration to see if our database connection is up.
+			// The check function will be executed for each HTTP request.
+			health.WithCheck(health.Check{
+				Name:    "database",      // A unique check name.
+				Timeout: 2 * time.Second, // A check specific timeout.
+				Check:   serialize.SecondDB.DB().PingContext,
+			}),
+		)
+		checkerResultSecond = checkerSecond.Check(ctx)
+	}
+
+	if checkerResult.Status == health.StatusDown || checkerResultSecond.Status == health.StatusDown {
+		ctx.JSON(400, map[string]interface{}{
+			"db-main":   checkerResult,
+			"db-second": checkerResultSecond,
+		})
+		return
+	}
+	ctx.JSON(200, map[string]interface{}{
+		"db-main":   checkerResult,
+		"db-second": checkerResultSecond,
+	})
+	return
+}
+
 func GetRouter(
 	needCrypto bool,
 	ConfigCustomRouter func(*gin.Engine) *gin.Engine,
@@ -80,6 +143,9 @@ func GetRouter(
 		Output:    ioutil.Discard,
 		SkipPaths: []string{"*"},
 	}
+	router.GET("/health", HealthCheckDatabase)
+	router.GET("/health/database", HealthCheckDatabase)
+	router.GET("/hc", HealthCheckDatabase)
 	router.Use(gin.LoggerWithConfig(c))
 	router.Use(gin.Recovery())
 	router.GET("/doc/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -124,7 +190,6 @@ func BootstrapHttp(
 		Addr:    addr,
 		Handler: router,
 	}
-
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("listen: %s\n", err)
