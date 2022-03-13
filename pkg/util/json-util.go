@@ -46,14 +46,14 @@ func JsonQuickParse(input interface{}) []byte {
 	var jsonByte []byte
 	defer func() []byte {
 		if err := recover(); err != nil {
-			log.Printf("json parse error: ", err)
+			log.Printf("json parse error: %+v", err)
 			return []byte(fmt.Sprintf("%#v", input))
 		}
 		return jsonByte
 	}()
 	jsonByte, err := json.Marshal(input)
 	if err != nil {
-		log.Printf("json parse error: ", err.Error())
+		log.Printf("json parse error: %+v", err)
 		if jsonByte == nil {
 			return []byte(fmt.Sprintf("%#v", input))
 		}
