@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"sync"
 )
 
 func GetCurrentDirectory() string {
@@ -19,53 +18,61 @@ func GetCurrentDirectory() string {
 	return strings.Replace(dir, "\\", "/", -1)
 }
 
-func RecursionListFile(fileName string, pattern string) []string {
+func RecursionListFile(fileName string, resultFileList *[]string, pattern *string) ([]string, error) {
 	var reg *regexp.Regexp
-	var resultFileList []string
+	defer func() []string {
+		if err := recover(); err != nil {
+			log.Printf("RecursionListFile error: %v", err)
+		}
+		return *resultFileList
+	}()
+	if resultFileList == nil {
+		resultFileList = new([]string)
+	}
 	file, err := os.Open(fileName)
 	if err != nil {
 		log.Println(err)
-		return nil
+		return *resultFileList, nil
 	}
 	fi, err := file.Stat()
 	if err != nil {
 		log.Println(err)
-		return nil
+		return *resultFileList, nil
 	}
 	if !fi.IsDir() {
 		log.Println(fileName, " is not a dir")
-		return nil
+		*resultFileList = append(*resultFileList, fileName)
+		return *resultFileList, nil
 	}
-	if pattern != "" {
-		reg, err = regexp.Compile(pattern)
+	if pattern != nil && *pattern != "" {
+		reg, err = regexp.Compile(*pattern)
 		if err != nil {
 			log.Println(err)
-			return nil
+			return *resultFileList, nil
 		}
 	}
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-	// 遍历目录
+	// recursively read path
 	filepath.Walk(fileName,
-		func(path string, f os.FileInfo, err error) error {
+		func(currentFilePath string, f os.FileInfo, err error) error {
 			if err != nil {
 				fmt.Println(err)
 				return err
 			}
-			if f.IsDir() {
-				resultFileList = append(resultFileList, RecursionListFile(fileName, pattern)...)
+			if fileName == currentFilePath {
 				return nil
 			}
-			if pattern != "" {
+			//if f.IsDir() {
+			//RecursionListFile(currentFilePath, resultFileList, nil)
+			//return nil
+			//}
+			if pattern != nil && *pattern != "" {
 				matched := reg.MatchString(f.Name())
 				if matched {
-					resultFileList = append(resultFileList, path)
+					*resultFileList = append(*resultFileList, currentFilePath)
 				}
 			}
-			resultFileList = append(resultFileList, path)
-			wg.Done()
+			*resultFileList = append(*resultFileList, currentFilePath)
 			return nil
 		})
-	wg.Wait()
-	return resultFileList
+	return *resultFileList, nil
 }
