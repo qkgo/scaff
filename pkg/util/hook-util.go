@@ -81,7 +81,7 @@ func PreRequestCheck(checkUrl string, requestBody []byte) error {
 
 func callRemoteHookServer(hookUrl string, hookPath string, requestBody string, token string) (*resty.Response, error) {
 	startTime := time.Now()
-	println("webhookurl:", hookUrl, "requestbody:", requestBody, "t1:", startTime.Format(time.RFC3339))
+	//println("webhookurl:", hookUrl, "requestbody:", requestBody, "t1:", startTime.Format(time.RFC3339))
 	cfg.Log.Info("webhookurl:", hookUrl, "requestbody:", requestBody, "t1:", startTime.Format(time.RFC3339))
 	if hookUrl != "" {
 		resp, err := resty.R().
@@ -92,14 +92,14 @@ func callRemoteHookServer(hookUrl string, hookPath string, requestBody string, t
 		endTime := time.Now()
 		distance := fmt.Sprintf("%.3f", float64(endTime.Sub(startTime).Nanoseconds())/seconds.NanoSecondRate)
 		if err != nil {
-			println("resp.webhookurl:", hookUrl, ".error:", err.Error(), "t2:",
-				distance, "s")
-			cfg.LogInfo.Info("resp.webhookurl:", hookUrl, ".error:", err.Error(), "t2:",
+			//println("resp.webhookurl:", hookUrl, ".error:", err.Error(), "t2:",
+			//	distance, "s")
+			cfg.LogInfo.Error("resp.webhookurl:", hookUrl, ".error:", err.Error(), "t2:",
 				distance, "s")
 			return resp, err
 		}
-		println("resp.webhookurl:", hookUrl, ".status:", resp.Status(), "body:", string(resp.Body()), "t2:",
-			distance, "s")
+		//println("resp.webhookurl:", hookUrl, ".status:", resp.Status(), "body:", string(resp.Body()), "t2:",
+		//	distance, "s")
 		cfg.LogInfo.Info("resp.webhookurl:", hookUrl, ".status:", resp.Status(), "body:", string(resp.Body()), "t2:",
 			distance, "s")
 		return resp, err
@@ -116,14 +116,14 @@ func callRemoteHookServer(hookUrl string, hookPath string, requestBody string, t
 	endTime := time.Now()
 	distance := fmt.Sprintf("%.3f", float64(endTime.Sub(startTime).Nanoseconds())/seconds.NanoSecondRate)
 	if err != nil {
-		println("resp.webhookurl:", hookUrl, ".error:", err.Error(), "t2:",
-			distance, "s")
-		cfg.LogInfo.Info("resp.webhookurl:", hookUrl, ".error:", err.Error(), "t2:",
+		//println("resp.webhookurl:", hookUrl, ".error:", err.Error(), "t2:",
+		//	distance, "s")
+		cfg.LogInfo.Error("resp.webhookurl:", hookUrl, ".error:", err.Error(), "t2:",
 			distance, "s")
 		return resp, err
 	}
-	println("resp.webhookurl:", hookUrl, ".status:", resp.Status(), "body:", string(resp.Body()), "t2:",
-		distance, "s")
+	//println("resp.webhookurl:", hookUrl, ".status:", resp.Status(), "body:", string(resp.Body()), "t2:",
+	//	distance, "s")
 	cfg.LogInfo.Info("resp.webhookurl:", hookUrl, ".status:", resp.Status(), "body:", string(resp.Body()), "t2:",
 		distance, "s")
 	return resp, err
