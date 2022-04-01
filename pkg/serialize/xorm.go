@@ -47,6 +47,8 @@ func ConfigSecondXDatabase(dialect string, url string) {
 		system.Exit(-200)
 		return
 	}
+	cfg.XOrmLog = &log.SqlLogger{Log: cfg.SqlLog}
+	engine.SetLogger(cfg.XOrmLog)
 	engine.ShowSQL()
 	SecondXDB = engine
 	return
