@@ -125,11 +125,11 @@ func InitLogByProjectNameV3(
 
 func settingLogFormatTypeByOSEnv(logger **logrus.Logger) {
 	logType := os.Getenv("LOG-TYPE")
+	if logType == "" {
+		logType = os.Getenv("LOG_TYPE")
+	}
 	if logType == "" && ConfigParam != nil {
 		logType = ConfigParam.GetString("log.type")
-		if logType == "" {
-			logType = os.Getenv("LOG-TYPE")
-		}
 	}
 	switch strings.ToLower(logType) {
 	case "logback-json":
