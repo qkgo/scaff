@@ -1,9 +1,10 @@
 package cfg
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/qkgo/scaff/pkg/util"
 	"github.com/sirupsen/logrus"
+	"log"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -40,7 +41,7 @@ func JavaJsonFormatWithWrapper(entry *logrus.Entry) ([]byte, error) {
 			"thread":     getGID(),
 			"message":    entry.Message,
 		}
-		return []byte(fmt.Sprintf("%s\n", util.JsonQuickParse(logMap))), nil
+		return []byte(fmt.Sprintf("%s\n", jsonParse(logMap))), nil
 	} else {
 		logMap := map[string]interface{}{
 			"@timestamp": timestamp,
@@ -49,7 +50,7 @@ func JavaJsonFormatWithWrapper(entry *logrus.Entry) ([]byte, error) {
 			"thread":     getGID(),
 			"message":    entry.Message,
 		}
-		return []byte(fmt.Sprintf("%s\n", util.JsonQuickParse(logMap))), nil
+		return []byte(fmt.Sprintf("%s\n", jsonParse(logMap))), nil
 	}
 }
 
@@ -74,7 +75,7 @@ func PrintJavaJsonWithEntry(entry *logrus.Entry) ([]byte, error) {
 			"thread":     getGID(),
 			"message":    entry.Message,
 		}
-		return []byte(fmt.Sprintf("%s\n", util.JsonQuickParse(logMap))), nil
+		return []byte(fmt.Sprintf("%s\n", jsonParse(logMap))), nil
 	} else {
 		logMap := map[string]interface{}{
 			"@timestamp": timestamp,
@@ -83,6 +84,25 @@ func PrintJavaJsonWithEntry(entry *logrus.Entry) ([]byte, error) {
 			"thread":     getGID(),
 			"message":    entry.Message,
 		}
-		return []byte(fmt.Sprintf("%s\n", util.JsonQuickParse(logMap))), nil
+		return []byte(fmt.Sprintf("%s\n", jsonParse(logMap))), nil
 	}
+}
+
+func jsonParse(input interface{}) []byte {
+	var jsonByte []byte
+	defer func() []byte {
+		if err := recover(); err != nil {
+			log.Printf("json parse error: %+v", err)
+			return []byte(fmt.Sprintf("%#v", input))
+		}
+		return jsonByte
+	}()
+	jsonByte, err := json.Marshal(input)
+	if err != nil {
+		log.Printf("json parse error: %+v", err)
+		if jsonByte == nil {
+			return []byte(fmt.Sprintf("%#v", input))
+		}
+	}
+	return jsonByte
 }
