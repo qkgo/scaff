@@ -52,7 +52,9 @@ func (s SqlLogger) SetLevel(l core.LogLevel) {
 }
 
 func (s SqlLogger) ShowSQL(show ...bool) {
-	s.isShowSql = show[0]
+	if len(show) > 0 {
+		s.isShowSql = show[0]
+	}
 }
 
 func (s SqlLogger) IsShowSQL() bool {
