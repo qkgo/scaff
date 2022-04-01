@@ -22,7 +22,7 @@ func InitValidationServerHost() string {
 		validationServerHost = cfg.OzConfig.GetValidationHost()
 	}
 	if validationServerHost == "" {
-		cfg.LogInfo.Error("hook server url not found")
+		cfg.LogInfo.Warn("hook server url not found")
 	}
 	return validationServerHost
 }
@@ -37,7 +37,7 @@ func InitHookServerHost(queryPath string) (string, string) {
 		hookServerHost = cfg.OzConfig.GetHookServerHost()
 	}
 	if validationServerHost == "" {
-		cfg.LogInfo.Error("hook server url not found")
+		cfg.LogInfo.Warn("hook server url not found")
 	}
 	return hookServerHost, hookServerHost
 }
@@ -105,7 +105,7 @@ func callRemoteHookServer(hookUrl string, hookPath string, requestBody string, t
 		return resp, err
 	}
 	if hookServerHost == "" {
-		cfg.Log.Error("hook server url not found")
+		cfg.Log.Warn("hook server url not found")
 		return nil, errors.New("hook server url not found")
 	}
 	secondUrl := hookServerHost + hookPath + ":check"
