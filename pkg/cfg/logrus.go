@@ -5,6 +5,7 @@ import (
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/qkgo/scaff/pkg/util/system"
 	"io"
+	"log"
 	"os"
 	"path"
 	"strconv"
@@ -99,18 +100,11 @@ func InitLogByProjectNameV3(
 		system.Exit(-1)
 		return
 	}
-	logType := os.Getenv("LOG_TYPE")
-	if logType == "" && ConfigParam != nil {
-		logType = ConfigParam.GetString("log.type")
-	}
-	switch strings.ToLower(logType) {
-	case "logback-json":
-		(*logger).SetFormatter(new(JavaJsonFormatter))
-	case "json":
-		(*logger).SetFormatter(new(logrus.JSONFormatter))
-	default:
-		(*logger).SetFormatter(new(PlainFormatter))
-	}
+
+	settingLogFormatTypeByOSEnv(logger)
+
+	settingLogLevelByOSEnv(logger)
+
 	if logToFile == "" {
 		fmt.Printf("%6.9s;%6.9s; %9.9s;  [logtoFile]:false , write stdout\n", projectName, env, level)
 		(*logger).SetOutput(os.Stdout)
@@ -127,6 +121,39 @@ func InitLogByProjectNameV3(
 	}
 
 	go (*logger).Infof("%9.9s;%9.9s; %9.9s; - init log succeed", projectName, env, level)
+}
+
+func settingLogFormatTypeByOSEnv(logger **logrus.Logger) {
+	logType := os.Getenv("LOG-TYPE")
+	if logType == "" && ConfigParam != nil {
+		logType = ConfigParam.GetString("log.type")
+		if logType == "" {
+			logType = os.Getenv("LOG-TYPE")
+		}
+	}
+	switch strings.ToLower(logType) {
+	case "logback-json":
+		(*logger).SetFormatter(new(JavaJsonFormatter))
+	case "json":
+		(*logger).SetFormatter(new(logrus.JSONFormatter))
+	default:
+		(*logger).SetFormatter(new(PlainFormatter))
+	}
+}
+
+func settingLogLevelByOSEnv(logger **logrus.Logger) {
+	logLevelFromEnv := os.Getenv("LOG-LEVEL")
+	if logLevelFromEnv == "" {
+		logLevelFromEnv = os.Getenv("LOG_LEVEL")
+	}
+	if logLevelFromEnv != "" {
+		settingLogLevel, parsingLogLevelError := logrus.ParseLevel(logLevelFromEnv)
+		if parsingLogLevelError != nil {
+			log.Printf("logrus log level not match at: %s  has: %v", logLevelFromEnv, parsingLogLevelError)
+		} else {
+			(*logger).SetLevel(settingLogLevel)
+		}
+	}
 }
 
 func getOutputPath(projectName string) string {
