@@ -105,7 +105,7 @@ func callRemoteHookServer(hookUrl string, hookPath string, requestBody string, t
 		return resp, err
 	}
 	if hookServerHost == "" {
-		cfg.Log.Warn("hook server url not found")
+		//cfg.Log.Warn("hook server url not found")
 		return nil, errors.New("hook server url not found")
 	}
 	secondUrl := hookServerHost + hookPath + ":check"
