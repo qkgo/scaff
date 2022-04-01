@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -102,10 +103,13 @@ func InitLogByProjectNameV3(
 	if logType == "" && ConfigParam != nil {
 		logType = ConfigParam.GetString("log.type")
 	}
-	if logType == "json" {
+	switch strings.ToLower(logType) {
+	case "logback-json":
+		(*logger).SetFormatter(new(JavaJsonFormatter))
+	case "json":
 		(*logger).SetFormatter(new(logrus.JSONFormatter))
-	} else {
-		(*logger).SetFormatter(new(MyFormatter))
+	default:
+		(*logger).SetFormatter(new(PlainFormatter))
 	}
 	if logToFile == "" {
 		fmt.Printf("%6.9s;%6.9s; %9.9s;  [logtoFile]:false , write stdout\n", projectName, env, level)
