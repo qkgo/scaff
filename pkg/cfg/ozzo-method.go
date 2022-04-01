@@ -1,7 +1,6 @@
 package cfg
 
 import (
-	"fmt"
 	ozzoConfig "github.com/go-ozzo/ozzo-config"
 	"os"
 	"strconv"
@@ -9,14 +8,14 @@ import (
 
 type OzzConfig struct{}
 
-func (*OzzConfig) GetConfig() *ozzoConfig.Config{
+func (*OzzConfig) GetConfig() *ozzoConfig.Config {
 	return ConfigParam
 }
 
 func (*OzzConfig) GetCryptoOption() bool {
 	CRYPTO := os.Getenv("CRYPTO")
 	if CRYPTO != "" {
-		fmt.Println("CRYPTO:", CRYPTO)
+		//fmt.Println("CRYPTO:", CRYPTO)
 		if CRYPTO == "false" {
 			return false
 		}

@@ -3,6 +3,7 @@ package cfg
 import (
 	ozzo "github.com/go-ozzo/ozzo-config"
 	"github.com/gofrs/uuid"
+	"github.com/qkgo/scaff/pkg/log"
 	"github.com/sirupsen/logrus"
 	"strconv"
 	"sync"
@@ -23,6 +24,8 @@ var LogRpc *logrus.Logger
 var LogKey *logrus.Logger
 
 var SqlLog *logrus.Logger
+
+var XOrmLog *log.SqlLogger
 
 var ManualLog *logrus.Logger
 
