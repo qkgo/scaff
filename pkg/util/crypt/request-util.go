@@ -256,7 +256,7 @@ func Crypto() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		startTime := time.Now()
 		c.Header("Request-UUID", strconv.Itoa(int(startTime.UnixNano())))
-		println("id:", startTime.UnixNano(), ",req:", c.Request.RequestURI, ",method:", c.Request.Method, ",t1:", startTime.Format(time.RFC3339))
+		//println("id:", startTime.UnixNano(), ",req:", c.Request.RequestURI, ",method:", c.Request.Method, ",t1:", startTime.Format(time.RFC3339))
 		cfg.LogInfo.Info("id:", startTime.UnixNano(), ",req:", c.Request.RequestURI, ",method:", c.Request.Method, ",t1:", startTime.Format(time.RFC3339))
 		if c.Request.Method == "POST" || c.Request.Method == "PUT" {
 			requestBody := GetDecryptedString(c)
@@ -277,7 +277,7 @@ func Crypto() gin.HandlerFunc {
 		if err {
 			email = "-"
 		}
-		println("id:", startTime.UnixNano(), ",req:", c.Request.RequestURI, ",method:", c.Request.Method, ",by:", email, ",ip:", c.Request.RemoteAddr, "t2:", distance, "s")
+		//println("id:", startTime.UnixNano(), ",req:", c.Request.RequestURI, ",method:", c.Request.Method, ",by:", email, ",ip:", c.Request.RemoteAddr, "t2:", distance, "s")
 		cfg.LogInfo.Info("id:", startTime.UnixNano(), ",req:", c.Request.RequestURI, ",method:", c.Request.Method, ",by:", email, ",ip:", c.Request.RemoteAddr, "t2:", distance, "s")
 		return
 	}
@@ -306,7 +306,7 @@ func CryptPrivate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		startTime := time.Now()
 		c.Header("Request-UUID", strconv.Itoa(int(startTime.UnixNano())))
-		println("req:", c.Request.RequestURI, ",method:", c.Request.Method, ",t1:", startTime.Format(time.RFC3339))
+		//println("req:", c.Request.RequestURI, ",method:", c.Request.Method, ",t1:", startTime.Format(time.RFC3339))
 		cfg.LogInfo.Info("req:", c.Request.RequestURI, ",method:", c.Request.Method, ",t1:", startTime.Format(time.RFC3339))
 		if c.Request.Method == "POST" || c.Request.Method == "PUT" {
 			requestBody := GetDecryptedString(c)
@@ -343,7 +343,7 @@ func CryptPrivate() gin.HandlerFunc {
 			return
 		}
 		c.Set("role", tokenMap)
-		println("id:", startTime.UnixNano(), ",req:", c.Request.RequestURI, ",method:", c.Request.Method, ",by:", tokenMap.Email, "ip:", c.Request.RemoteAddr)
+		//println("id:", startTime.UnixNano(), ",req:", c.Request.RequestURI, ",method:", c.Request.Method, ",by:", tokenMap.Email, "ip:", c.Request.RemoteAddr)
 		cfg.LogInfo.Info("id:", startTime.UnixNano(), ",req:", c.Request.RequestURI, ",method:", c.Request.Method, ",by:", tokenMap.Email, "ip:", c.Request.RemoteAddr)
 		blw := &bodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
 		c.Writer = blw
@@ -352,7 +352,7 @@ func CryptPrivate() gin.HandlerFunc {
 		c.Header("Content-Type", "application/octet-stream")
 		endTime := time.Now()
 		distance := fmt.Sprintf("%.3f", float64(endTime.Sub(startTime).Nanoseconds())/seconds.NanoSecondRate)
-		println("id:", startTime.UnixNano(), ",req:", c.Request.RequestURI, ",method:", c.Request.Method, ",by:", tokenMap.Email, ",ip:", c.Request.RemoteAddr, ",t2:", distance, "s")
+		//println("id:", startTime.UnixNano(), ",req:", c.Request.RequestURI, ",method:", c.Request.Method, ",by:", tokenMap.Email, ",ip:", c.Request.RemoteAddr, ",t2:", distance, "s")
 		cfg.LogInfo.Info("id:", startTime.UnixNano(), ",req:", c.Request.RequestURI, ",method:", c.Request.Method, ",by:", tokenMap.Email, "ip:", c.Request.RemoteAddr, ",t2:", distance, "s")
 		return
 	}
@@ -395,7 +395,8 @@ func TokenRole() gin.HandlerFunc {
 		}
 		c.Set("role", tokenMap)
 		c.Set("email", tokenMap.Email)
-		println(c.Request.URL.String(), ":", tokenMap.Email, ":", c.Request.RemoteAddr)
+		cfg.LogInfo.Info(c.Request.URL.String(), ":", tokenMap.Email, ":", c.Request.RemoteAddr)
+		//println(c.Request.URL.String(), ":", tokenMap.Email, ":", c.Request.RemoteAddr)
 		c.Next()
 		return
 	}

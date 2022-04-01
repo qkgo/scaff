@@ -32,7 +32,7 @@ func InitLogByProjectNameV3(
 	level string,
 	printConsole bool) {
 	if projectName == "" {
-		println("projectName is not define")
+		log.Println("projectName is not define")
 		system.Exit(-1)
 		return
 	}
@@ -95,7 +95,7 @@ func InitLogByProjectNameV3(
 		rotatelogs.WithRotationTime(time.Hour),
 	)
 	if err != nil {
-		println("config local file system logger error:", err.Error())
+		//log.Println("config local file system logger error:", err.Error())
 		fmt.Printf("config local file system logger error: %v", errors.WithStack(err))
 		system.Exit(-1)
 		return
@@ -160,10 +160,10 @@ func getOutputPath(projectName string) string {
 	if ConfigParam != nil {
 		baseLogPath := ConfigParam.GetString("log.path." + projectName)
 		if baseLogPath == "" {
-			println("baseLogPath is not define")
+			log.Println("baseLogPath is not define")
 			currentPath, err := os.Getwd()
 			if err != nil {
-				println("os.Getwd() shutdown. err:", err.Error())
+				log.Printf("os.Getwd() shutdown. err: %v", err.Error())
 				system.Exit(-1)
 				return ""
 			}
@@ -173,7 +173,7 @@ func getOutputPath(projectName string) string {
 	} else {
 		currentPath, err := os.Getwd()
 		if err != nil {
-			println("os.Getwd() shutdown. err:", err.Error())
+			log.Printf("os.Getwd() shutdown. err: %v", err.Error())
 			system.Exit(-1)
 			return ""
 		}
