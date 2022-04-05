@@ -6,12 +6,12 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/qkgo/scaff/pkg/cfg"
+	"github.com/qkgo/scaff/pkg/log"
 	"github.com/qkgo/scaff/pkg/serialize"
 	"github.com/qkgo/scaff/pkg/util/crypt"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -196,7 +196,7 @@ func BootstrapHttp(
 		addr = ":8896"
 	}
 
-	cfg.LogInfo.Info("start listen:", addr)
+	log.I("start listen:", addr)
 	srv := &http.Server{
 		Addr:    addr,
 		Handler: router,
@@ -209,7 +209,7 @@ func BootstrapHttp(
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	cfg.LogInfo.Info("Shutdown Server ...")
+	log.I("Shutdown Server ...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second/10)
 	defer cancel()
@@ -218,8 +218,8 @@ func BootstrapHttp(
 	}
 	select {
 	case <-ctx.Done():
-		cfg.LogInfo.Info("timeout of 0.1 seconds.")
+		log.I("timeout of 0.1 seconds.")
 	}
-	cfg.LogInfo.Info("Server exiting")
+	log.I("Server exiting")
 	return srv
 }
