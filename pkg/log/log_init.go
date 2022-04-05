@@ -4,7 +4,6 @@ import (
 	"fmt"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/pkg/errors"
-	"github.com/qkgo/scaff/pkg/cfg"
 	"github.com/qkgo/scaff/pkg/util/system"
 	"github.com/sirupsen/logrus"
 	"io"
@@ -26,9 +25,30 @@ func GetProjectName() string {
 	return ProjectName
 }
 
+type LogInitConfiguration struct {
+	ProjectName  string
+	ProjectPath  string
+	PrintLevel   string
+	PrintConsole bool
+	LogKeepHour  int
+}
+
+func InitLogCfg(
+	logger **logrus.Logger,
+	initCfg *LogInitConfiguration) {
+	InitLogByProjectName(
+		logger,
+		initCfg.ProjectName,
+		initCfg.ProjectPath,
+		initCfg.PrintLevel,
+		initCfg.PrintConsole,
+	)
+}
+
 func InitLogByProjectName(
 	logger **logrus.Logger,
 	projectName string,
+	projectPath string,
 	level string,
 	printConsole bool) {
 	if projectName == "" {
@@ -36,25 +56,25 @@ func InitLogByProjectName(
 		system.Exit(-1)
 		return
 	}
-	baseLogPath := getOutputPath(projectName)
+	baseLogPath := getOutputPath(projectPath)
 	if baseLogPath == "" {
 		return
 	}
 	env := os.Getenv("ENV")
-	if env == "" && cfg.ConfigParam != nil {
-		env = cfg.ConfigParam.GetString("env")
-	}
+	//if env == "" && cfg.ConfigParam != nil {
+	//	env = cfg.ConfigParam.GetString("env")
+	//}
 	logToFile := os.Getenv("LOG_TO_FILE")
-	if logToFile == "" && cfg.ConfigParam != nil {
-		logToFile = cfg.ConfigParam.GetString("logtoFile")
-	}
+	//if logToFile == "" && cfg.ConfigParam != nil {
+	//	logToFile = cfg.ConfigParam.GetString("logtoFile")
+	//}
 	if logToFile == "" {
 		logToFile = "DEFAULT_WRITE_FILE"
 	}
 	logMaxAgeParam := os.Getenv("LOG_KEEP_HOUR")
-	if logMaxAgeParam == "" && cfg.ConfigParam != nil {
-		logMaxAgeParam = cfg.ConfigParam.GetString("maxLogKeepHour")
-	}
+	//if logMaxAgeParam == "" && cfg.ConfigParam != nil {
+	//	logMaxAgeParam = cfg.ConfigParam.GetString("maxLogKeepHour")
+	//}
 	var logMaxAge time.Duration
 	if logMaxAgeParam == "" {
 		logMaxAge = 2 * time.Hour
@@ -127,9 +147,9 @@ func settingLogFormatTypeByOSEnv(logger **logrus.Logger) {
 	if logType == "" {
 		logType = os.Getenv("LOG_TYPE")
 	}
-	if logType == "" && cfg.ConfigParam != nil {
-		logType = cfg.ConfigParam.GetString("log.type")
-	}
+	//if logType == "" && cfg.ConfigParam != nil {
+	//	logType = cfg.ConfigParam.GetString("log.type")
+	//}
 	switch strings.ToLower(logType) {
 	case "logback-json":
 		(*logger).SetFormatter(new(JavaJsonFormatter))
@@ -155,21 +175,16 @@ func settingLogLevelByOSEnv(logger **logrus.Logger) {
 	}
 }
 
-func getOutputPath(projectName string) string {
-	if cfg.ConfigParam != nil {
-		baseLogPath := cfg.ConfigParam.GetString("log.path." + projectName)
+func getOutputPath(baseLogPath string) string {
+	if baseLogPath == "" {
+		baseLogPath = os.Getenv("LOG-PATH")
 		if baseLogPath == "" {
-			log.Println("baseLogPath is not define")
-			currentPath, err := os.Getwd()
-			if err != nil {
-				log.Printf("os.Getwd() shutdown. err: %v", err.Error())
-				system.Exit(-1)
-				return ""
-			}
-			return path.Join(currentPath, "logs")
+			baseLogPath = os.Getenv("LOG_PATH")
 		}
-		return baseLogPath
-	} else {
+		if baseLogPath != "" {
+			return baseLogPath
+		}
+		log.Println("baseLogPath is not define")
 		currentPath, err := os.Getwd()
 		if err != nil {
 			log.Printf("os.Getwd() shutdown. err: %v", err.Error())
@@ -177,5 +192,7 @@ func getOutputPath(projectName string) string {
 			return ""
 		}
 		return path.Join(currentPath, "logs")
+	} else {
+		return baseLogPath
 	}
 }
