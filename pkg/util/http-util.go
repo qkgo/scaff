@@ -196,14 +196,14 @@ func BootstrapHttp(
 		addr = ":8896"
 	}
 
-	log.I("start listen:", addr)
+	log.I("start listen: %s", addr)
 	srv := &http.Server{
 		Addr:    addr,
 		Handler: router,
 	}
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("listen: %s\n", err)
+			log.Fatalf("listen: %v\n", err)
 		}
 	}()
 	quit := make(chan os.Signal)
@@ -214,7 +214,7 @@ func BootstrapHttp(
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second/10)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatal("Server Shutdown:", err)
+		log.Fatal("Server Shutdown: %v", err)
 	}
 	select {
 	case <-ctx.Done():
