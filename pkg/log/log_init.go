@@ -1,9 +1,12 @@
-package cfg
+package log
 
 import (
 	"fmt"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
+	"github.com/pkg/errors"
+	"github.com/qkgo/scaff/pkg/cfg"
 	"github.com/qkgo/scaff/pkg/util/system"
+	"github.com/sirupsen/logrus"
 	"io"
 	"log"
 	"os"
@@ -11,10 +14,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/pkg/errors"
-	//"github.com/rifflock/lfshook"
-	"github.com/sirupsen/logrus"
 )
 
 var ProjectName string
@@ -22,11 +21,12 @@ var ProjectName string
 func SettingProjectName(projectName string) {
 	ProjectName = projectName
 }
+
 func GetProjectName() string {
 	return ProjectName
 }
 
-func InitLogByProjectNameV3(
+func InitLogByProjectName(
 	logger **logrus.Logger,
 	projectName string,
 	level string,
@@ -41,19 +41,19 @@ func InitLogByProjectNameV3(
 		return
 	}
 	env := os.Getenv("ENV")
-	if env == "" && ConfigParam != nil {
-		env = ConfigParam.GetString("env")
+	if env == "" && cfg.ConfigParam != nil {
+		env = cfg.ConfigParam.GetString("env")
 	}
 	logToFile := os.Getenv("LOG_TO_FILE")
-	if logToFile == "" && ConfigParam != nil {
-		logToFile = ConfigParam.GetString("logtoFile")
+	if logToFile == "" && cfg.ConfigParam != nil {
+		logToFile = cfg.ConfigParam.GetString("logtoFile")
 	}
 	if logToFile == "" {
 		logToFile = "DEFAULT_WRITE_FILE"
 	}
 	logMaxAgeParam := os.Getenv("LOG_KEEP_HOUR")
-	if logMaxAgeParam == "" && ConfigParam != nil {
-		logMaxAgeParam = ConfigParam.GetString("maxLogKeepHour")
+	if logMaxAgeParam == "" && cfg.ConfigParam != nil {
+		logMaxAgeParam = cfg.ConfigParam.GetString("maxLogKeepHour")
 	}
 	var logMaxAge time.Duration
 	if logMaxAgeParam == "" {
@@ -95,7 +95,6 @@ func InitLogByProjectNameV3(
 		rotatelogs.WithRotationTime(time.Hour),
 	)
 	if err != nil {
-		//log.Println("config local file system logger error:", err.Error())
 		fmt.Printf("config local file system logger error: %v", errors.WithStack(err))
 		system.Exit(-1)
 		return
@@ -128,8 +127,8 @@ func settingLogFormatTypeByOSEnv(logger **logrus.Logger) {
 	if logType == "" {
 		logType = os.Getenv("LOG_TYPE")
 	}
-	if logType == "" && ConfigParam != nil {
-		logType = ConfigParam.GetString("log.type")
+	if logType == "" && cfg.ConfigParam != nil {
+		logType = cfg.ConfigParam.GetString("log.type")
 	}
 	switch strings.ToLower(logType) {
 	case "logback-json":
@@ -157,8 +156,8 @@ func settingLogLevelByOSEnv(logger **logrus.Logger) {
 }
 
 func getOutputPath(projectName string) string {
-	if ConfigParam != nil {
-		baseLogPath := ConfigParam.GetString("log.path." + projectName)
+	if cfg.ConfigParam != nil {
+		baseLogPath := cfg.ConfigParam.GetString("log.path." + projectName)
 		if baseLogPath == "" {
 			log.Println("baseLogPath is not define")
 			currentPath, err := os.Getwd()
