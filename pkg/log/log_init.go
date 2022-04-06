@@ -26,11 +26,12 @@ func GetProjectName() string {
 }
 
 type LogInitConfiguration struct {
-	ProjectName  string
-	ProjectPath  string
-	PrintLevel   string
-	PrintConsole bool
-	LogKeepHour  int
+	ProjectName   string
+	ProjectPath   string
+	PrintLevel    string
+	LoggerSubName string
+	PrintConsole  bool
+	LogKeepHour   int
 }
 
 func InitLogCfg(
@@ -40,7 +41,7 @@ func InitLogCfg(
 		logger,
 		initCfg.ProjectName,
 		initCfg.ProjectPath,
-		initCfg.PrintLevel,
+		initCfg.LoggerSubName,
 		initCfg.PrintConsole,
 	)
 }
@@ -49,7 +50,7 @@ func InitLogByProjectName(
 	logger **logrus.Logger,
 	projectName string,
 	projectPath string,
-	level string,
+	loggerSubName string,
 	printConsole bool) {
 	if projectName == "" {
 		log.Println("projectName is not define")
@@ -93,11 +94,11 @@ func InitLogByProjectName(
 	filename := ""
 	if env != "" {
 		filename = projectName + "-" + env
-		if level != "" {
-			filename = filename + "-" + level
+		if loggerSubName != "" {
+			filename = filename + "-" + loggerSubName
 		}
-	} else if level != "" {
-		filename = projectName + "-" + level
+	} else if loggerSubName != "" {
+		filename = projectName + "-" + loggerSubName
 	} else {
 		filename = projectName
 	}
@@ -125,21 +126,23 @@ func InitLogByProjectName(
 	settingLogLevelByOSEnv(logger)
 
 	if logToFile == "" {
-		fmt.Printf("%6.9s;%6.9s; %9.9s;  [logtoFile]:false , write stdout\n", projectName, env, level)
+		fmt.Printf("%6.9s;%6.9s; %9.9s;  [logtoFile]:false , write stdout\n", projectName, env, loggerSubName)
 		(*logger).SetOutput(os.Stdout)
 	} else if printConsole {
-		fmt.Printf("%6.9s;%6.9s; %9.9s;  [logtoFile]:true [printConsole]:true, write stdout and file: %s \n", projectName, env, level, logFilePath)
+		fmt.Printf("%6.9s;%6.9s; %9.9s;  [logtoFile]:true [printConsole]:true, write stdout and file: ${%s} \n",
+			projectName, env, loggerSubName, logFilePath)
 		writers := []io.Writer{
 			writer,
 			os.Stdout}
 		fileAndStdoutWriter := io.MultiWriter(writers...)
 		(*logger).SetOutput(fileAndStdoutWriter)
 	} else {
-		fmt.Printf("%6.9s;%6.9s; %9.9s;  [logtoFile]:ture [printConsole]:false, write file: %s \n", projectName, env, level, logFilePath)
+		fmt.Printf("%6.9s;%6.9s; %9.9s;  [logtoFile]:ture [printConsole]:false, write file: ${%s} \n",
+			projectName, env, loggerSubName, logFilePath)
 		(*logger).SetOutput(writer)
 	}
 
-	go (*logger).Infof("%9.9s;%9.9s; %9.9s; - init log succeed", projectName, env, level)
+	go (*logger).Infof("%9.9s;%9.9s; %9.9s; - init log succeed", projectName, env, loggerSubName)
 }
 
 func settingLogFormatTypeByOSEnv(logger **logrus.Logger) {
