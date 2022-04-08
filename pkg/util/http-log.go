@@ -2,7 +2,7 @@ package util
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/qkgo/scaff/pkg/cfg"
+	"github.com/qkgo/scaff/pkg/log"
 	"time"
 )
 
@@ -16,7 +16,7 @@ func GinToLogrus() gin.HandlerFunc {
 		reqUri := c.Request.RequestURI
 		statusCode := c.Writer.Status()
 		clientIP := c.ClientIP()
-		cfg.LogHttp.Infof("| %3d | %13v | %15s | %4s | %s |",
+		log.I("| %3d | %13v | %15s | %4s | %s |",
 			statusCode,
 			latencyTime,
 			clientIP,
