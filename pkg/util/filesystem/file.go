@@ -137,20 +137,29 @@ func MkdirpList(paths []string) {
 	}()
 }
 
-func GetFilesByFilter(currentPath string, filenameFilter string) (error, []string) {
-	var files []string
-	err := godirwalk.Walk(currentPath, &godirwalk.Options{
-		Unsorted: false,
-		Callback: func(path string, info *godirwalk.Dirent) error {
-			if strings.Contains(path, filenameFilter) {
+func GetFilesByFilter(currentPath string, filenameFilter string) (err error, files []string) {
+	if filenameFilter != "" {
+		err = godirwalk.Walk(currentPath, &godirwalk.Options{
+			Unsorted: false,
+			Callback: func(path string, info *godirwalk.Dirent) error {
+				if strings.Contains(path, filenameFilter) {
+					files = append(files, path)
+				}
+				return nil
+			},
+		})
+	} else {
+		err = godirwalk.Walk(currentPath, &godirwalk.Options{
+			Unsorted: false,
+			Callback: func(path string, info *godirwalk.Dirent) error {
 				files = append(files, path)
-			}
-			return nil
-		},
-	})
+				return nil
+			},
+		})
+	}
 	sort.Strings(files)
 	files = reverse(files)
-	return err, files
+	return
 }
 
 func GetFiles(currentPath string) (error, []string) {
