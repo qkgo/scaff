@@ -221,7 +221,11 @@ func Fatalf(format string, args ...interface{}) {
 		return
 	}
 	if Log == nil {
-		log.Printf(args[0].(string), args[1:])
+		if args == nil {
+			log.Fatalf(format)
+			return
+		}
+		log.Fatalf(format, args...)
 		return
 	}
 	if args == nil {
