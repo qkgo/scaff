@@ -147,10 +147,14 @@ func GetRouter(
 	corsDefault.AllowCredentials = true
 	corsDefault.AllowHeaders = []string{"Origin", "token", "Content-Length", "Content-Type", "session", "DNT", "content-type", "s", "timezone", "tz", "specify", "order"}
 	corsDefault.AllowAllOrigins = true
-	router.GET("/", DefaultView)
-	router.GET("/health", HealthCheckDatabase)
-	router.GET("/health/database", HealthCheckDatabase)
-	router.GET("/hc", HealthCheckDatabase)
+	if os.Getenv("IGNORE_ROOT") == "" {
+		router.GET("/", DefaultView)
+	}
+	if os.Getenv("IGNORE_HC") == "" {
+		router.GET("/health", HealthCheckDatabase)
+		router.GET("/health/database", HealthCheckDatabase)
+		router.GET("/hc", HealthCheckDatabase)
+	}
 	router.Use(GinToLogrus())
 	router.Use(cors.New(corsDefault))
 	c := gin.LoggerConfig{
