@@ -2,6 +2,7 @@ package version
 
 import (
 	"fmt"
+	"github.com/qkgo/scaff/pkg/util"
 	"runtime"
 	"strconv"
 	"time"
@@ -29,4 +30,5 @@ func init() {
 		runtime.Version(), runtime.GOOS, runtime.GOARCH,
 		buildDate,
 	)
+	util.CompletionName = CommitHash
 }
