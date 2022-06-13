@@ -19,6 +19,15 @@ import (
 	"time"
 )
 
+var HostName = "notfound.0"
+var CompletionName = "notfound.1"
+
+func init() {
+	if os.Getenv("HOSTNAME") != "" {
+		HostName = os.Getenv("HOSTNAME")
+	}
+}
+
 func DefaultView(ctx *gin.Context) {
 	ctx.JSON(200, map[string]interface{}{
 		"success": true,
@@ -35,6 +44,10 @@ func NoRouterHandle() gin.HandlerFunc {
 			"error":   "Not router",
 			"success": false,
 			"code":    -404.1,
+			"path":    context.FullPath(),
+			"uri":     context.Request.RequestURI,
+			"addr":    context.Request.RemoteAddr,
+			"host":    context.Request.Host,
 		})
 	}
 }
@@ -45,6 +58,10 @@ func NoMethodHandle() gin.HandlerFunc {
 			"error":   "Not method",
 			"success": false,
 			"code":    -404.2,
+			"path":    context.FullPath(),
+			"uri":     context.Request.RequestURI,
+			"addr":    context.Request.RemoteAddr,
+			"host":    context.Request.Host,
 		})
 	}
 }
@@ -54,6 +71,10 @@ func NoRouterHandler(context *gin.Context) {
 		"error":   "Not router",
 		"success": false,
 		"code":    -404.1,
+		"path":    context.FullPath(),
+		"uri":     context.Request.RequestURI,
+		"addr":    context.Request.RemoteAddr,
+		"host":    context.Request.Host,
 	})
 	return
 }
@@ -63,13 +84,17 @@ func NoMethodHandler(context *gin.Context) {
 		"error":   "Not method",
 		"success": false,
 		"code":    -404.2,
+		"path":    context.FullPath(),
+		"uri":     context.Request.RequestURI,
+		"addr":    context.Request.RemoteAddr,
+		"host":    context.Request.Host,
 	})
 	return
 }
 
 func VersionHandler() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		context.Header("server-version", "2.1.6")
+		context.Header("server-version", CompletionName)
 		return
 	}
 }
