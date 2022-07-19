@@ -13,6 +13,7 @@ import (
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 	"io/ioutil"
 	"net/http"
+	"net/http/httputil"
 	"os"
 	"os/signal"
 	"syscall"
@@ -160,6 +161,23 @@ func HealthCheckDatabase(ctx *gin.Context) {
 	return
 }
 
+func RequestLogger() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		log.Println(ctx.Request.Host, ctx.Request.RemoteAddr, ctx.Request.RequestURI)
+
+		// Save a copy of this request for debugging.
+		requestDump, err := httputil.DumpRequest(ctx.Request, true)
+		if err != nil {
+			log.E("%v", err)
+			ctx.Next()
+			return
+		}
+		log.I(string(requestDump))
+
+		ctx.Next()
+	}
+}
+
 func GetRouter(
 	needCrypto bool,
 	ConfigCustomRouter func(*gin.Engine) *gin.Engine,
@@ -179,6 +197,9 @@ func GetRouter(
 		router.GET("/health", HealthCheckDatabase)
 		router.GET("/health/database", HealthCheckDatabase)
 		router.GET("/hc", HealthCheckDatabase)
+	}
+	if os.Getenv("HTTP_DETAIL") == "" {
+		router.Use(RequestLogger())
 	}
 	router.Use(GinToLogrus())
 	router.Use(cors.New(corsDefault))
