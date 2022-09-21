@@ -168,10 +168,6 @@ func GetRouter(
 	gin.SetMode(gin.ReleaseMode)
 	gin.DefaultWriter = ioutil.Discard
 	router := gin.Default()
-	corsDefault := cors.DefaultConfig()
-	corsDefault.AllowCredentials = true
-	corsDefault.AllowHeaders = []string{"Origin", "token", "Content-Length", "Content-Type", "session", "DNT", "content-type", "s", "timezone", "tz", "specify", "order"}
-	corsDefault.AllowAllOrigins = true
 	if os.Getenv("IGNORE_ROOT") == "" {
 		router.GET("/", DefaultView)
 	}
@@ -180,8 +176,14 @@ func GetRouter(
 		router.GET("/health/database", HealthCheckDatabase)
 		router.GET("/hc", HealthCheckDatabase)
 	}
+	if os.Getenv("NEED_CORS") != "" {
+		corsDefault := cors.DefaultConfig()
+		corsDefault.AllowCredentials = true
+		corsDefault.AllowHeaders = []string{"Origin", "token", "Content-Length", "Content-Type", "session", "DNT", "content-type", "s", "timezone", "tz", "specify", "order"}
+		corsDefault.AllowAllOrigins = true
+		router.Use(cors.New(corsDefault))
+	}
 	router.Use(GinToLogrus())
-	router.Use(cors.New(corsDefault))
 	c := gin.LoggerConfig{
 		Output:    ioutil.Discard,
 		SkipPaths: []string{"*"},
