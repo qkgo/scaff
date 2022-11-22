@@ -3,3 +3,13 @@ node_modules/
 output/
 test/
 vendor/
+.ignore_*
+*.out
+*.pdf
+*.png
+*.exe
+*.linuxexe
+out/
+*.linuxapp
+*.app
+*.pprof
