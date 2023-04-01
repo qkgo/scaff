@@ -100,6 +100,14 @@ func VersionHandler() gin.HandlerFunc {
 	}
 }
 
+func GetRawString(context *gin.Context) []byte {
+	data, err := context.GetRawData()
+	if err != nil {
+		cfg.LogInfo.Info(err)
+	}
+	return data
+}
+
 // HealthCheckDatabase
 // @Summary HealthCheckDatabase
 // @Description HealthCheckDatabase
@@ -198,10 +206,7 @@ func GetRouter(
 		router.Use(RequestLogger())
 	}
 	if os.Getenv("NEED_CORS") != "" {
-		corsDefault := cors.DefaultConfig()
-		corsDefault.AllowCredentials = true
-		corsDefault.AllowHeaders = []string{"Origin", "token", "Content-Length", "Content-Type", "session", "DNT", "content-type", "s", "timezone", "tz", "specify", "order"}
-		corsDefault.AllowAllOrigins = true
+		corsDefault := corsSettings()
 		router.Use(cors.New(corsDefault))
 	}
 	router.Use(GinToLogrus())
@@ -274,4 +279,90 @@ func BootstrapHttp(
 	}
 	log.I("Server exiting")
 	return srv
+}
+
+func corsSettings() cors.Config {
+	corsDefault := cors.DefaultConfig()
+	corsDefault.AllowCredentials = true
+	corsDefault.AllowHeaders = []string{
+		"Accept",
+		"authorization",
+		"Accept-Encoding",
+		"Accept-Language",
+		"connection",
+		"Connection",
+		"Origin",
+		"token",
+		"Content-Length",
+		"Content-Type",
+		"session",
+		"Referer",
+		"Cache-Control",
+		"cookie",
+		"Cookie",
+		"sec-ch-ua",
+		"Sec-Ch-Ua",
+		"sec-ch-ua-mobile",
+		"Sec-Ch-Ua-Mobile",
+		"sec-ch-ua-platform",
+		"Sec-Ch-Ua-Platform",
+		"Sec-Fetch-Dest",
+		"Sec-Fetch-Mode",
+		"Sec-Fetch-Site",
+		"Host",
+		"Pragma",
+		"DNT",
+		"Dnt",
+		"content-type",
+		"User-Agent",
+		"s",
+		"timezone",
+		"tz",
+		"specify",
+		"order",
+		"x-ms-token",
+	}
+	corsDefault.ExposeHeaders = []string{
+		"Accept",
+		"authorization",
+		"Accept-Encoding",
+		"Accept-Language",
+		"connection",
+		"Connection",
+		"Origin",
+		"token",
+		"Content-Length",
+		"Content-Type",
+		"session",
+		"Referer",
+		"Cache-Control",
+		"cookie",
+		"Cookie",
+		"sec-ch-ua",
+		"Sec-Ch-Ua",
+		"sec-ch-ua-mobile",
+		"Sec-Ch-Ua-Mobile",
+		"sec-ch-ua-platform",
+		"Sec-Ch-Ua-Platform",
+		"Sec-Fetch-Dest",
+		"Sec-Fetch-Mode",
+		"Sec-Fetch-Site",
+		"Host",
+		"Pragma",
+		"DNT",
+		"Dnt",
+		"content-type",
+		"User-Agent",
+		"s",
+		"timezone",
+		"tz",
+		"specify",
+		"order",
+		"x-ms-token",
+	}
+	corsDefault.AllowOriginFunc = func(origin string) bool {
+		return true
+	}
+	//corsDefault.AllowAllOrigins = true
+	return corsDefault
 }

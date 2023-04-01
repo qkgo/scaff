@@ -24,14 +24,17 @@ func CancelableCopy(ctx context.Context, dst io.Writer, src io.Reader, closeFunc
 	// possible in the call process.
 	size, err := io.Copy(dst, readerFunc(func(p []byte) (int, error) {
 		// golang non-blocking channel: https://gobyexample.com/non-blocking-channel-operations
+		//log.Println("io copy loop")
 		select {
 		// if context has been canceled
+
 		case <-ctx.Done():
 			// stop process and propagate "context canceled" error
-			go closeFunc()
+			closeFunc()
 			return 0, ctx.Err()
 		default:
 			// otherwise just run default io.Reader implementation
+			//log.Println("reading bytes ")
 			return src.Read(p)
 		}
 	}))

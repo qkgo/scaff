@@ -38,6 +38,7 @@ type UploadFileInformation struct {
 	FileList       []string
 	CheckFile      func(io.Reader) error
 	SumMd5         bool
+	MaxKeys        int64
 }
 
 func GetMemoryWriter() io.Writer {
