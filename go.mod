@@ -63,6 +63,7 @@ require (
 	github.com/mattn/go-sqlite3 v2.0.1+incompatible // indirect
 	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/stretchr/objx v0.4.0 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/swaggo/swag v1.7.4 // indirect
 	github.com/ugorji/go/codec v1.1.7 // indirect
