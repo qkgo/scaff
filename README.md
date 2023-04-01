@@ -1,14 +1,14 @@
-# QKGo Scaff - A Go Web Project Scaffolding Tool
+# Scaff - A Go Web Project Scaffolding Tool
 
 > Scaff is a scaffolding tool designed to help you bootstrap and accelerate your Go web development projects. It provides a well-structured template and a set of utilities that make it easy to create and maintain Go web applications.
 
 ### Features
 - Pre-configured project structure that follows best practices
 - Middleware integration for logging, request validation, and more
-- Easy-to-use CLI for project generation and management
 - Modular design for easy customization and extensibility
 - Support for popular Go web frameworks, such as Gin and Echo
 - Detailed documentation and examples
+- [TODO] Easy-to-use CLI for project generation and management
 
 ### Installation
 To install QKGo Scaff, run the following command:
