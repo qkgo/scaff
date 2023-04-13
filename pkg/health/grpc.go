@@ -11,7 +11,7 @@ import (
 )
 
 type healthServer struct {
-	grpc_health_v1.UnimplementedHealthServer
+	grpc_health_v1.HealthServer
 }
 
 func (s *healthServer) Check(ctx context.Context, req *grpc_health_v1.HealthCheckRequest) (*grpc_health_v1.HealthCheckResponse, error) {
