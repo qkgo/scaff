@@ -482,11 +482,14 @@ func CheckToken(context *gin.Context) (*SignData, error) {
 		return nil, err
 	}
 	tokenMap := SignData{}
-	subject := token.Claims.(jwt.MapClaims)["sub"].(string)
-	err = json.Unmarshal([]byte(subject), &tokenMap)
+	subject := token.Claims.(jwt.MapClaims)["sub"]
+	err = json.Unmarshal([]byte(subject.(string)), &tokenMap)
 	if err != nil {
 		println(err.Error())
 		return nil, err
+	}
+	if token.Claims.(jwt.MapClaims)["aud"] != "" {
+		tokenMap.Email = token.Claims.(jwt.MapClaims)["aud"].(string)
 	}
 	return &tokenMap, nil
 }
